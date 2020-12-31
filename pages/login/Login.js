@@ -5,7 +5,7 @@ import {
   FirebaseRecaptchaVerifierModal,
   FirebaseRecaptchaBanner,
 } from "expo-firebase-recaptcha";
-import { firebaseConfig, Firebase } from "../../firebase";
+import { Firebase, firebaseConfig, auth, firestore } from "../../firebase";
 
 export default function Login() {
   const captchaRef = useRef(null);
@@ -39,12 +39,12 @@ export default function Login() {
         verificationID,
         verificationCode
       );
-      await Firebase.auth()
-        .signInWithCredential(credential)
-        .then((response) => {
-          console.log(response);
+      await auth.signInWithCredential(credential).then(async (response) => {
+        setMessage({
+          text: "Phone Authentication Successful 👍",
+          error: false,
         });
-      setMessage({ text: "Phone Authentication Successful 👍", error: false });
+      });
     } catch (error) {
       setMessage({ text: error.message, error: true });
     }
@@ -77,7 +77,7 @@ export default function Login() {
         Cofirm Verification Code
       </Button>
       {message ? (
-        <Card>
+        <Card style={{ backgroundColor: message.error ? "red" : "green" }}>
           <Caption>{message.text}</Caption>
         </Card>
       ) : undefined}

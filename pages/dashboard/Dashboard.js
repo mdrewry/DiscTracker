@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Title, Button } from "react-native-paper";
-import { Firebase } from "../../firebase";
+import { auth } from "../../firebase";
 export default function Dashboard({ user, setUser }) {
   const handleLogout = async () => {
-    await Firebase.auth()
+    await auth
       .signOut()
       .then(() => {
         // Sign-out successful.
@@ -15,7 +15,7 @@ export default function Dashboard({ user, setUser }) {
   };
   return (
     <View style={styles.container}>
-      <Title>Hello XD</Title>
+      <Title>Hello {user.phoneNumber}</Title>
       <Button onPress={handleLogout}>logout</Button>
     </View>
   );
