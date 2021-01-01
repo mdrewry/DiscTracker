@@ -1,19 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Appbar } from "react-native-paper";
-import { auth } from "../firebase";
 
 export default function NavPage({ navigation, title, children }) {
-  const handleLogout = async () => {
-    await auth
-      .signOut()
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-      });
-  };
   return (
     <View style={styles.container}>
       <Appbar style={styles.appbar}>
@@ -32,7 +21,6 @@ export default function NavPage({ navigation, title, children }) {
             navigation.navigate("Profile");
           }}
         />
-        <Appbar.Action icon="window-close" size={30} onPress={handleLogout} />
       </Appbar>
       <View style={styles.main}>{children}</View>
     </View>
