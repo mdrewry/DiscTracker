@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Button, TextInput, Caption, Title, Card } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { Caption, Title, Avatar } from "react-native-paper";
 import {
   FirebaseRecaptchaVerifierModal,
   FirebaseRecaptchaBanner,
 } from "expo-firebase-recaptcha";
 import { Firebase, firebaseConfig, auth, firestore } from "../../firebase";
-
+import CustomCard, { ColumnCard } from "../../components/CustomCard";
+import { PhoneField, CodeField } from "../../components/CustomField";
+import CustomButton from "../../components/CustomButton";
 export default function Login() {
   const captchaRef = useRef(null);
   const [phoneNumberDisplay, setPhoneNumberDisplay] = useState();
@@ -14,10 +16,9 @@ export default function Login() {
   const [verificationCode, setVerificationCode] = useState();
   const [verificationID, setVerificationID] = useState();
   const [message, setMessage] = useState();
-
   const sendVerificationCode = async () => {
     try {
-      const phoneNumber = phoneNumberDisplay.replace(/[- )(]/g, "");
+      const phoneNumber = "+" + phoneNumberDisplay.replace(/[- )(]/g, "");
       setPhoneNumber(phoneNumber);
       const phoneProvider = new Firebase.auth.PhoneAuthProvider();
       const verificationID = await phoneProvider.verifyPhoneNumber(
@@ -40,6 +41,31 @@ export default function Login() {
         verificationCode
       );
       await auth.signInWithCredential(credential).then(async (response) => {
+        const { user } = response;
+        const docRef = firestore.collection("users").doc(user.uid);
+        const doc = await docRef.get();
+        if (!doc.exists) {
+          docRef.set({
+            friends: [],
+            groups: [],
+            phoneNumber: user.phoneNumber,
+            name: "",
+            email: "",
+            imageURL: "",
+            stats: {
+              numGames: 0,
+              numHoles: 0,
+              numShots: 0,
+              numPar: 0,
+              numBirdie: 0,
+              numEagle: 0,
+              numAlbatross: 0,
+              numBogey: 0,
+              numDoubleBogey: 0,
+              numAce: 0,
+            },
+          });
+        }
         setMessage({
           text: "Phone Authentication Successful 👍",
           error: false,
@@ -51,45 +77,70 @@ export default function Login() {
   };
   return (
     <View style={styles.container}>
-      <Title>Login</Title>
+      <View style={styles.fill} />
+      <ColumnCard>
+        <Title style={styles.headerText}>Welcome to DiscTracker</Title>
+        <Avatar.Icon size={100} icon="chart-bubble" />
+      </ColumnCard>
+      <View style={styles.fill} />
       <FirebaseRecaptchaVerifierModal
         ref={captchaRef}
         firebaseConfig={firebaseConfig}
         attemptInvisibleVerification={true}
       />
-      <TextInput
-        placeholder="+1 999 999 9999"
-        autoFocus
-        autoCompleteType="tel"
-        keyboardType="phone-pad"
-        textContentType="telephoneNumber"
-        onChangeText={setPhoneNumberDisplay}
-      />
-      <Button disabled={!phoneNumberDisplay} onPress={sendVerificationCode}>
-        Send Verification Code
-      </Button>
-      <TextInput
-        placeholder="123456"
-        editable={!!verificationID}
-        onChangeText={setVerificationCode}
-      />
-      <Button disabled={!verificationID} onPress={handleLogin}>
-        Cofirm Verification Code
-      </Button>
-      {message ? (
-        <Card style={{ backgroundColor: message.error ? "red" : "green" }}>
-          <Caption>{message.text}</Caption>
-        </Card>
-      ) : undefined}
-      <FirebaseRecaptchaBanner />
+      <CustomCard>
+        <PhoneField
+          value={phoneNumberDisplay}
+          setValue={setPhoneNumberDisplay}
+          autoFocus={true}
+          editable={true}
+        />
+        <CustomButton
+          text="Send Verification Code"
+          icon="send"
+          disabled={!phoneNumberDisplay}
+          handlePress={sendVerificationCode}
+        />
+        <View style={styles.section} />
+        <CodeField
+          setValue={setVerificationCode}
+          editable={!!verificationID}
+          autoFocus={false}
+        />
+        <CustomButton
+          text="Cofirm Verification Code"
+          disabled={!!!verificationID}
+          handlePress={handleLogin}
+        />
+      </CustomCard>
+      <View style={styles.fill} />
+      <View style={styles.footer}>
+        {message ? (
+          <Caption style={{ color: message.error ? "red" : "green" }}>
+            {message.text}
+          </Caption>
+        ) : undefined}
+        <FirebaseRecaptchaBanner />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    justifyContent: "center",
+  container: { flex: 1, padding: 20 },
+  section: {
+    marginTop: 20,
+  },
+  headerSection: {
+    height: 200,
+  },
+  headerText: {
+    marginBottom: 20,
+  },
+  fill: {
+    flexGrow: 1,
+  },
+  footer: {
+    alignSelf: "center",
   },
 });
