@@ -45,13 +45,21 @@ export default function Login() {
         const docRef = firestore.collection("users").doc(user.uid);
         const doc = await docRef.get();
         if (!doc.exists) {
+          let getURL = "";
+          await storage
+            .ref()
+            .child(`defaults/defaultImage`)
+            .getDownloadURL()
+            .then((url) => {
+              getURL = url;
+            });
           docRef.set({
             friends: [],
             groups: [],
             phoneNumber: user.phoneNumber,
             name: "",
             email: "",
-            imageURL: "",
+            imageURL: getURL,
             stats: {
               numGames: 0,
               numHoles: 0,
@@ -64,6 +72,7 @@ export default function Login() {
               numDoubleBogey: 0,
               numAce: 0,
             },
+            currentGame: "",
           });
         }
         setMessage({

@@ -3,11 +3,14 @@ import { StyleSheet, View } from "react-native";
 import { Title, Text, Subheading, Avatar, Surface } from "react-native-paper";
 import NavPage from "../../components/NavPage";
 import CustomCard from "../../components/CustomCard";
+import { EmptyButton } from "../../components/CustomButton";
 export default function Dashboard({ user, theme, navigation }) {
-  console.log(typeof user);
+  const handleGameButton = () => {
+    navigation.navigate("ScoreCard");
+  };
   return (
     <NavPage navigation={navigation} title="Dashboard">
-      <CustomCard style={styles.statsCard}>
+      <CustomCard>
         <Title>Summary & Performance</Title>
         <View>
           <Subheading>Overall</Subheading>
@@ -47,28 +50,16 @@ export default function Dashboard({ user, theme, navigation }) {
         </View>
       </CustomCard>
       <CustomCard>
-        <Title>New Game</Title>
-        <View style={styles.rowCenter}>
-          <Surface
-            style={{
-              backgroundColor: theme.colors.accent,
-              ...styles.surface,
-            }}
-          >
-            <Avatar.Icon size={50} icon="account" />
-            <Subheading>Solo Game</Subheading>
-          </Surface>
-          <View style={styles.filler} />
-          <Surface
-            style={{
-              backgroundColor: theme.colors.accent,
-              ...styles.surface,
-            }}
-          >
-            <Avatar.Icon size={50} icon="account-group" />
-            <Subheading>Group Game</Subheading>
-          </Surface>
-        </View>
+        <Title>Play Game</Title>
+        <EmptyButton
+          style={{ backgroundColor: theme.colors.accent, ...styles.surface }}
+          handlePress={handleGameButton}
+        >
+          <Avatar.Icon size={50} icon={"play"} />
+          <Subheading>
+            {user.currentGame ? "Resume Game" : "New Game"}
+          </Subheading>
+        </EmptyButton>
       </CustomCard>
       <CustomCard>
         <Title>Find Friends</Title>
@@ -86,7 +77,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 20,
     borderRadius: 5,
-    width: "48%",
   },
   filler: {
     flexGrow: 1,

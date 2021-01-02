@@ -1,23 +1,38 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
-import { Title, Avatar, Text, Subheading, Button } from "react-native-paper";
-import { launchImageLibrary, ImagePicker } from "react-native-image-picker";
-import { auth, firestore } from "../../firebase";
+import { Title, Avatar, Text, Subheading } from "react-native-paper";
+import * as ImagePicker from "expo-image-picker";
+import { auth, storage } from "../../firebase";
 import NavPage from "../../components/NavPage";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
 import CustomButton from "../../components/CustomButton";
 import CustomDialog from "../../components/CustomDialog";
 export default function Profile({ user, setUser, theme, navigation }) {
-  const docRef = firestore.collection("users").doc(user.id);
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
+  const [image, setImage] = useState(user.imageURL);
   const [save, setSave] = useState(false);
   const [openResetForm, setOpenResetForm] = useState(false);
+  const [openSignOutForm, setOpenSignOutForm] = useState(false);
   const didMountRef = useRef(false);
   useEffect(() => {
+    const getPermissions = async () => {
+      if (Platform.OS !== "web") {
+        const {
+          status,
+        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== "granted") {
+          alert("Sorry, we need camera roll permissions to make this work!");
+        }
+      }
+    };
     if (didMountRef.current) setSave(true);
-    else didMountRef.current = true;
+    else {
+      didMountRef.current = true;
+      getPermissions();
+      return () => getPermissions();
+    }
   }, [name, email]);
   const handleLogout = async () => {
     await auth
@@ -30,21 +45,21 @@ export default function Profile({ user, setUser, theme, navigation }) {
       });
   };
   const saveProfile = async () => {
-    await docRef.update({
+    await user.ref.update({
       name: name,
       email: email,
     });
     setSave(false);
     Keyboard.dismiss();
   };
-  const handleResetPressed = () => {
-    setOpenResetForm(true);
+  const handleToggleReset = () => {
+    setOpenResetForm((curr) => !curr);
   };
-  const handleResetFalse = () => {
-    setOpenResetForm(false);
+  const handleToggleSignoutForm = () => {
+    setOpenSignOutForm((curr) => !curr);
   };
   const resetProfile = async () => {
-    await docRef.update({
+    await user.ref.update({
       stats: {
         numGames: 0,
         numHoles: 0,
@@ -58,30 +73,36 @@ export default function Profile({ user, setUser, theme, navigation }) {
         numAce: 0,
       },
     });
-    handleResetFalse();
+    handleToggleReset();
   };
-  const handleImageUpload = async () => {
-    let imageURI = "";
-    let options = {
-      storageOptions: {
-        skipBackup: true,
-        path: "images",
-      },
-    };
-    ImagePicker.launchImageLibrary(options, (response) => {
-      console.log("Response = ", response);
-
-      if (response.didCancel) {
-        console.log("User cancelled image picker");
-      } else if (response.error) {
-        console.log("ImagePicker Error: ", response.error);
-      } else if (response.customButton) {
-        console.log("User tapped custom button: ", response.customButton);
-        alert(response.customButton);
-      } else {
-        imageURI = response.uri;
-      }
+  const upload = async (uri) => {
+    let imageBlob = null;
+    await fetch(uri).then(async (response) => {
+      imageBlob = await response.blob();
     });
+    let getURL = "";
+    await storage.ref(`userDocuments/${user.id}/profilePhoto`).put(imageBlob);
+    await storage
+      .ref()
+      .child(`userDocuments/${user.id}/profilePhoto`)
+      .getDownloadURL()
+      .then((url) => {
+        getURL = url;
+      });
+    setImage(getURL);
+    await user.ref.update({ imageURL: getURL });
+  };
+
+  const handleImageUpload = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      await upload(result.uri);
+    }
   };
   return (
     <NavPage navigation={navigation} title="Profile">
@@ -89,7 +110,7 @@ export default function Profile({ user, setUser, theme, navigation }) {
         <View style={styles.rowCenter}>
           <Avatar.Image
             size={90}
-            source={user.imageURL}
+            source={{ uri: image }}
             onPress={handleImageUpload}
           />
           <View style={styles.titleWrapper}>
@@ -122,6 +143,12 @@ export default function Profile({ user, setUser, theme, navigation }) {
           handlePress={handleImageUpload}
           disabled={false}
         />
+        <View style={styles.text} />
+        <CustomButton
+          text={save ? "Save" : "Saved!"}
+          handlePress={saveProfile}
+          disabled={!save}
+        />
       </CustomCard>
 
       <CustomCard>
@@ -129,36 +156,44 @@ export default function Profile({ user, setUser, theme, navigation }) {
         <View style={styles.text} />
         <CustomButton
           text="Sign Out"
-          handlePress={handleLogout}
+          handlePress={handleToggleSignoutForm}
           disabled={false}
         />
+        <CustomDialog
+          visible={openSignOutForm}
+          setVisible={setOpenSignOutForm}
+          type="Attention"
+          prompt="Signing out will require you to re-verify your device in the future."
+        >
+          <CustomButton
+            text="Cancel"
+            handlePress={handleToggleSignoutForm}
+            disabled={false}
+          />
+          <View style={styles.buttonSpacer} />
+          <CustomButton text="Confirm" handlePress={handleLogout} />
+        </CustomDialog>
+
         <View style={styles.text} />
         <CustomButton
           text="Reset Stats"
-          handlePress={handleResetPressed}
+          handlePress={handleToggleReset}
           disabled={false}
         />
         <CustomDialog
           visible={openResetForm}
-          setVisible={setOpenResetForm}
+          setVisible={handleToggleReset}
           type="Attention"
           prompt="You are about to permanently reset all statistics recorded on this account."
         >
           <CustomButton
             text="Cancel"
-            handlePress={handleResetFalse}
+            handlePress={handleToggleReset}
             disabled={false}
           />
+          <View style={styles.buttonSpacer} />
           <CustomButton text="Confirm" handlePress={resetProfile} />
         </CustomDialog>
-      </CustomCard>
-      <View style={styles.filler} />
-      <CustomCard>
-        <CustomButton
-          text={save ? "Save" : "Saved!"}
-          handlePress={saveProfile}
-          disabled={!save}
-        />
       </CustomCard>
     </NavPage>
   );
@@ -178,5 +213,8 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
+  },
+  buttonSpacer: {
+    width: 20,
   },
 });
