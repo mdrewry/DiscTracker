@@ -2,9 +2,9 @@ import * as React from "react";
 import { StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
 
-export default function CustomCard({ children }) {
+export default function CustomCard({ children, cardStyle }) {
   return (
-    <Card style={styles.card}>
+    <Card style={{ ...styles.card, ...cardStyle }}>
       <Card.Content>{children}</Card.Content>
     </Card>
   );

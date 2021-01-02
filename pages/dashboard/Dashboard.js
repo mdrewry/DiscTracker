@@ -1,70 +1,97 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Title, Text, Subheading, Avatar, Surface } from "react-native-paper";
-import NavPage from "../../components/NavPage";
+import { Title } from "react-native-paper";
+import Page from "../../components/Page";
 import CustomCard from "../../components/CustomCard";
-import { EmptyButton } from "../../components/CustomButton";
+import StatObj, { StatHeader } from "../../components/StatObj";
 export default function Dashboard({ user, theme, navigation }) {
-  const handleGameButton = () => {
-    navigation.navigate("ScoreCard");
-  };
+  const canDivide = user.stats.numGames > 0;
   return (
-    <NavPage navigation={navigation} title="Dashboard">
+    <Page navigation={navigation} title="Dashboard">
       <CustomCard>
-        <Title>Summary & Performance</Title>
-        <View>
-          <Subheading>Overall</Subheading>
-          <View style={styles.rowCenter}>
-            <Text># Games</Text>
-            <View style={styles.filler} />
-            <Text>{user.stats.numGames}</Text>
-          </View>
-          <View style={styles.rowCenter}>
-            <Text># Holes</Text>
-            <View style={styles.filler} />
-            <Text>{user.stats.numHoles}</Text>
-          </View>
-          <View style={styles.rowCenter}>
-            <Text># Shots</Text>
-            <View style={styles.filler} />
-            <Text>{user.stats.numShots}</Text>
-          </View>
-        </View>
-        <View>
-          <Subheading>Performance</Subheading>
-          <View style={styles.rowCenter}>
-            <Text># Par</Text>
-            <View style={styles.filler} />
-            <Text>{user.stats.numPar}</Text>
-          </View>
-          <View style={styles.rowCenter}>
-            <Text># Bogey</Text>
-            <View style={styles.filler} />
-            <Text>{user.stats.numBogey}</Text>
-          </View>
-          <View style={styles.rowCenter}>
-            <Text># Birdie</Text>
-            <View style={styles.filler} />
-            <Text>{user.stats.numPar}</Text>
-          </View>
-        </View>
+        <StatHeader label="Overall" valueA="#" theme={theme} />
+        <StatObj label="Games" valueA={user.stats.numGames} theme={theme} />
+        <StatObj label="Holes" valueA={user.stats.numHoles} theme={theme} />
+        <StatObj label="Shots" valueA={user.stats.numShots} theme={theme} />
       </CustomCard>
       <CustomCard>
-        <Title>Play Game</Title>
-        <EmptyButton
-          style={{ backgroundColor: theme.colors.accent, ...styles.surface }}
-          handlePress={handleGameButton}
-        >
-          <Avatar.Icon size={50} icon={"play"} />
-          <Subheading>
-            {user.currentGame ? "Resume Game" : "New Game"}
-          </Subheading>
-        </EmptyButton>
+        <StatHeader label="Performance" valueA="#" valueB="%" theme={theme} />
+        <StatObj
+          label="Ace"
+          valueA={user.stats.numAce}
+          valueB={
+            canDivide
+              ? (user.stats.numAce / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          theme={theme}
+        />
+        <StatObj
+          label="Albatross"
+          valueA={user.stats.numAlbatross}
+          valueB={
+            canDivide
+              ? (user.stats.numAlbatross / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          total={user.stats.numHoles}
+          theme={theme}
+        />
+        <StatObj
+          label="Eagle"
+          valueA={user.stats.numEagle}
+          valueB={
+            canDivide
+              ? (user.stats.numEagle / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          theme={theme}
+        />
+        <StatObj
+          label="Birdie"
+          valueA={user.stats.numBirdie}
+          valueB={
+            canDivide
+              ? (user.stats.numBirdie / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          theme={theme}
+        />
+        <StatObj
+          label="Par"
+          valueA={user.stats.numPar}
+          valueB={
+            canDivide
+              ? (user.stats.numPar / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          theme={theme}
+        />
+        <StatObj
+          label="Bogey"
+          valueA={user.stats.numBogey}
+          valueB={
+            canDivide
+              ? (user.stats.numBogey / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          theme={theme}
+        />
+        <StatObj
+          label="Double Bogey"
+          valueA={user.stats.numDoubleBogey}
+          valueB={
+            canDivide
+              ? (user.stats.numDoubleBogey / user.stats.numHoles).toFixed(2)
+              : "0.00"
+          }
+          theme={theme}
+        />
       </CustomCard>
       <CustomCard>
-        <Title>Find Friends</Title>
+        <Title>Previous Games</Title>
       </CustomCard>
-    </NavPage>
+    </Page>
   );
 }
 
@@ -77,6 +104,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     padding: 20,
     borderRadius: 5,
+  },
+  title: {
+    marginTop: 20,
   },
   filler: {
     flexGrow: 1,

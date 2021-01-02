@@ -19,6 +19,7 @@ export default function ScoreCard({ user, theme, navigation }) {
   const [holeScore, setHoleScore] = useState(3);
   const [holePar, setHolePar] = useState(3);
   const [buttonText, setButtonText] = useState("Begin Game");
+  const [headerText, setHeaderText] = useState("Create Game");
   const [loading, setLoading] = useState(user.currentGame !== "");
   useEffect(() => {
     const getData = async () => {
@@ -53,11 +54,14 @@ export default function ScoreCard({ user, theme, navigation }) {
         scoreRef,
         courseRef,
       });
+      setHeaderText("Playing Game");
       if (scoreData.currentHole === courseData.numHoles - 1)
         setButtonText("End Game");
-      else if (scoreData.currentHole === courseData.numHoles)
+      else if (scoreData.currentHole === courseData.numHoles) {
         setButtonText("Exit to Dashboard");
-      else setButtonText("Next Hole");
+        setHeaderText("Viewing Results");
+      } else setButtonText("Next Hole");
+
       setPage(scoreData.currentHole + 1);
       setLoading(false);
     };
@@ -157,13 +161,15 @@ export default function ScoreCard({ user, theme, navigation }) {
   };
   const handleNextPage = async () => {
     if (page === 0) {
-      if (enableNewCourseForm && courseName !== "") {
-        await handleNewCourse();
-      } else {
+      if (selectedCourse.id !== "") {
         await handleOldCourse();
+        setButtonText("Next Hole");
+        setPage((curr) => curr + 1);
+      } else if (enableNewCourseForm && courseName !== "") {
+        await handleNewCourse();
+        setButtonText("Next Hole");
+        setPage((curr) => curr + 1);
       }
-      setButtonText("Next Hole");
-      setPage((curr) => curr + 1);
     } else if (page > 0 && page <= currentGame.numHoles) {
       await handleScoreUpdate();
       setHolePar(
@@ -180,7 +186,7 @@ export default function ScoreCard({ user, theme, navigation }) {
   };
   if (loading) return <LoadingPage theme={theme} />;
   return (
-    <Page enableCancel={page === 0} title="Upload Game" navigation={navigation}>
+    <Page title={headerText} navigation={navigation}>
       <Fragment>
         {page === 0 && (
           <PageOne
@@ -219,7 +225,6 @@ export default function ScoreCard({ user, theme, navigation }) {
           <ResultsPage user={user} theme={theme} currentGame={currentGame} />
         )}
       </Fragment>
-
       <View style={styles.filler} />
       <CustomCard>
         <CustomButton text={buttonText} handlePress={handleNextPage} />

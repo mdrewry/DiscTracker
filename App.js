@@ -13,17 +13,17 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Profile from "./pages/profile/Profile";
 import ScoreCard from "./pages/scorecard/ScoreCard";
 const Stack = createStackNavigator();
-LogBox.ignoreLogs(["Setting a timer"]);
+
+LogBox.ignoreAllLogs(true);
 const _console = _.clone(console);
 console.warn = (message) => {
   if (message.indexOf("Setting a timer") <= -1) {
     _console.warn(message);
   }
 };
-
 const theme = {
   ...DefaultTheme,
-  roundness: 5,
+  roundness: 15,
   colors: {
     ...DefaultTheme.colors,
     primary: "#560bad",

@@ -3,7 +3,7 @@ import { Keyboard, StyleSheet, View } from "react-native";
 import { Title, Avatar, Text, Subheading } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import { auth, storage } from "../../firebase";
-import NavPage from "../../components/NavPage";
+import Page from "../../components/Page";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
 import CustomButton from "../../components/CustomButton";
@@ -105,7 +105,7 @@ export default function Profile({ user, setUser, theme, navigation }) {
     }
   };
   return (
-    <NavPage navigation={navigation} title="Profile">
+    <Page navigation={navigation} title="Profile">
       <CustomCard>
         <View style={styles.rowCenter}>
           <Avatar.Image
@@ -195,7 +195,7 @@ export default function Profile({ user, setUser, theme, navigation }) {
           <CustomButton text="Confirm" handlePress={resetProfile} />
         </CustomDialog>
       </CustomCard>
-    </NavPage>
+    </Page>
   );
 }
 

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { StyleSheet, View } from "react-native";
-import { Title, Text, Subheading } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
-export default function ResultsPage({ user, currentGame }) {
+import StatObj, { StatHeader } from "../../components/StatObj";
+export default function ResultsPage({ user, currentGame, theme }) {
   const [gameStats, setGameStats] = useState(null);
   useEffect(() => {
     const pars = currentGame.holes;
@@ -16,6 +16,7 @@ export default function ResultsPage({ user, currentGame }) {
       doubleBogey: 0,
       eagle: 0,
       shots: 0,
+      idealPar: 0,
       holes: currentGame.numHoles,
     };
     scores.forEach((value, index) => {
@@ -28,6 +29,7 @@ export default function ResultsPage({ user, currentGame }) {
       else if (value === par + 1) stats.bogey++;
       else if (value === par + 2) stats.doubleBogey++;
       stats.shots += value;
+      stats.idealPar += par;
     });
     setGameStats(stats);
     let userStats = user.stats;
@@ -43,9 +45,14 @@ export default function ResultsPage({ user, currentGame }) {
     userStats.numGames++;
 
     const updateUser = async () => {
-      await user.ref.update({ stats: userStats });
+      if (currentGame.firstPlaythrough)
+        await currentGame.courseRef.update({ par: stats.idealPar });
       await currentGame.scoreRef.update({
         statsRecorded: true,
+      });
+      await user.ref.update({
+        stats: userStats,
+        currentGame: currentGame.scoreRef.id,
       });
     };
     if (!currentGame.statsRecorded) {
@@ -55,64 +62,66 @@ export default function ResultsPage({ user, currentGame }) {
   }, []);
   return (
     <Fragment>
-      <CustomCard>
-        <Title>Course Complete</Title>
-      </CustomCard>
       {gameStats !== null && (
-        <CustomCard>
-          <Title>Summary & Performance</Title>
-          <View>
-            <Subheading>Overall</Subheading>
-            <View style={styles.rowCenter}>
-              <Text># Holes</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.holes}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Shots</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.shots}</Text>
-            </View>
-          </View>
-          <View>
-            <Subheading>Performance</Subheading>
-            <View style={styles.rowCenter}>
-              <Text># Ace</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.ace}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Albatross</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.albatross}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Eagle</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.eagle}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Birdie</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.birdie}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Par</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.par}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Bogey</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.bogey}</Text>
-            </View>
-            <View style={styles.rowCenter}>
-              <Text># Double Bogey</Text>
-              <View style={styles.filler} />
-              <Text>{gameStats.doubleBogey}</Text>
-            </View>
-          </View>
-        </CustomCard>
+        <Fragment>
+          <CustomCard>
+            <StatHeader label="Overall" valueA="#" theme={theme} />
+            <StatObj label="Holes" valueA={gameStats.holes} theme={theme} />
+            <StatObj label="Par" valueA={gameStats.idealPar} theme={theme} />
+            <StatObj label="Shots" valueA={gameStats.shots} theme={theme} />
+          </CustomCard>
+          <CustomCard>
+            <StatHeader
+              label="Performance"
+              valueA="#"
+              valueB="%"
+              theme={theme}
+            />
+            <StatObj
+              label="Ace"
+              valueA={gameStats.ace}
+              valueB={(gameStats.ace / gameStats.holes).toFixed(2)}
+              theme={theme}
+            />
+            <StatObj
+              label="Albatross"
+              valueA={gameStats.albatross}
+              valueB={(gameStats.albatross / gameStats.holes).toFixed(2)}
+              total={gameStats.holes}
+              theme={theme}
+            />
+            <StatObj
+              label="Eagle"
+              valueA={gameStats.eagle}
+              valueB={(gameStats.eagle / gameStats.holes).toFixed(2)}
+              theme={theme}
+            />
+            <StatObj
+              label="Birdie"
+              valueA={gameStats.birdie}
+              valueB={(gameStats.birdie / gameStats.holes).toFixed(2)}
+              theme={theme}
+            />
+            <StatObj
+              label="Par"
+              valueA={gameStats.par}
+              valueB={(gameStats.par / gameStats.holes).toFixed(2)}
+              theme={theme}
+            />
+            <StatObj
+              label="Bogey"
+              valueA={gameStats.bogey}
+              valueB={(gameStats.bogey / gameStats.holes).toFixed(2)}
+              theme={theme}
+            />
+            <StatObj
+              label="Double Bogey"
+              valueA={gameStats.doubleBogey}
+              valueB={(gameStats.doubleBogey / gameStats.holes).toFixed(2)}
+              theme={theme}
+            />
+          </CustomCard>
+        </Fragment>
       )}
     </Fragment>
   );
@@ -120,6 +129,9 @@ export default function ResultsPage({ user, currentGame }) {
 
 const styles = StyleSheet.create({
   text: {
+    marginTop: 20,
+  },
+  title: {
     marginTop: 20,
   },
   middleText: {

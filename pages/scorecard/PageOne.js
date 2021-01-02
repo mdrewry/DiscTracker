@@ -23,28 +23,34 @@ export default function PageOne({
     <Fragment>
       <CustomCard>
         <Title>1) Select A Course</Title>
+        {courses.map((course, index) => (
+          <SelectionButton
+            key={index}
+            style={{
+              backgroundColor: `${
+                course.id === selectedCourse.id
+                  ? theme.colors.accent
+                  : theme.colors.primary
+              }`,
+              ...styles.surface,
+            }}
+            handlePress={handleCourseSelect}
+            index={index}
+          >
+            <Title>{course.courseName} </Title>
+            <Subheading>{course.numHoles} Holes</Subheading>
+          </SelectionButton>
+        ))}
         <View style={styles.text} />
-        {courses.length > 0 && (
-          <Fragment>
-            <CustomButton
-              icon="flag"
-              text="Previous Course"
-              handlePress={() => {
-                setEnableNewCourseForm(false);
-              }}
-            />
-            <Text style={styles.middleText}> OR </Text>
-          </Fragment>
-        )}
         <CustomButton
           icon="flag-plus"
           text="New Course"
           handlePress={() => {
-            setEnableNewCourseForm(true);
+            setEnableNewCourseForm((curr) => !curr);
           }}
         />
       </CustomCard>
-      {enableNewCourseForm ? (
+      {enableNewCourseForm && (
         <CustomCard>
           <Title>Create Course</Title>
           <Text style={styles.text}>Name</Text>
@@ -73,28 +79,6 @@ export default function PageOne({
             maxValue={8}
             theme={theme}
           />
-        </CustomCard>
-      ) : (
-        <CustomCard>
-          <Title>Previous Courses</Title>
-          {courses.map((course, index) => (
-            <SelectionButton
-              key={index}
-              style={{
-                backgroundColor: `${
-                  course.id === selectedCourse.id
-                    ? theme.colors.accent
-                    : theme.colors.primary
-                }`,
-                ...styles.surface,
-              }}
-              handlePress={handleCourseSelect}
-              index={index}
-            >
-              <Title>{course.courseName} </Title>
-              <Subheading>{course.numHoles} Holes</Subheading>
-            </SelectionButton>
-          ))}
         </CustomCard>
       )}
     </Fragment>
@@ -125,7 +109,7 @@ const styles = StyleSheet.create({
     elevation: 8,
     display: "flex",
     marginTop: 20,
-    padding: 20,
-    borderRadius: 5,
+    padding: 15,
+    borderRadius: 15,
   },
 });
