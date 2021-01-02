@@ -5,15 +5,14 @@ import { LogBox } from "react-native";
 import _ from "lodash";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { firestore, auth } from "./firebase";
 import { LoadingPage } from "./components/Page";
 import Login from "./pages/login/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Profile from "./pages/profile/Profile";
 import ScoreCard from "./pages/scorecard/ScoreCard";
+import Friends from "./pages/friends/Friends";
 const Stack = createStackNavigator();
-
 LogBox.ignoreAllLogs(true);
 const _console = _.clone(console);
 console.warn = (message) => {
@@ -60,7 +59,7 @@ export default function App() {
         <LoadingPage theme={theme} />
       ) : (
         <View style={styles.container}>
-          {!user ? (
+          {!user || user.stats === undefined ? (
             <Login />
           ) : (
             <NavigationContainer>
@@ -71,12 +70,7 @@ export default function App() {
               >
                 <Stack.Screen name="Dashboard">
                   {(props) => (
-                    <Dashboard
-                      {...props}
-                      user={user}
-                      setUser={setUser}
-                      theme={theme}
-                    />
+                    <Dashboard {...props} user={user} theme={theme} />
                   )}
                 </Stack.Screen>
                 <Stack.Screen name="Profile">
@@ -88,6 +82,9 @@ export default function App() {
                   {(props) => (
                     <ScoreCard {...props} user={user} theme={theme} />
                   )}
+                </Stack.Screen>
+                <Stack.Screen name="Friends">
+                  {(props) => <Friends {...props} user={user} theme={theme} />}
                 </Stack.Screen>
               </Stack.Navigator>
             </NavigationContainer>

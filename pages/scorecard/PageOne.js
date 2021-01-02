@@ -3,7 +3,10 @@ import { StyleSheet, View } from "react-native";
 import { Title, Text, Subheading } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
-import CustomButton, { SelectionButton } from "../../components/CustomButton";
+import CustomButton, {
+  SelectionButton,
+  ButtonMenu,
+} from "../../components/CustomButton";
 import CustomSlider from "../../components/CustomSlider";
 export default function PageOne({
   courses,
@@ -71,12 +74,10 @@ export default function PageOne({
             theme={theme}
           />
           <Text style={styles.text}>Mercy Rule</Text>
-          <CustomSlider
+          <ButtonMenu
+            range={8}
             value={courseMercyRule}
             setValue={setCourseMercyRule}
-            step={1}
-            minValue={1}
-            maxValue={8}
             theme={theme}
           />
         </CustomCard>

@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Title, Subheading } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import CustomSlider from "../../components/CustomSlider";
+import { ButtonMenu } from "../../components/CustomButton";
 export default function PageN({
   page,
   index,
@@ -36,26 +37,22 @@ export default function PageN({
             <Subheading>(only first playthrough)</Subheading>
           </View>
           <View style={styles.text} />
-          <CustomSlider
+          <ButtonMenu
             theme={theme}
             value={holePar}
             setValue={setHolePar}
-            minValue={1}
-            maxValue={5}
-            step={1}
+            range={currentGame.mercyRule}
           />
         </CustomCard>
       )}
       <CustomCard>
         <Title>Score</Title>
         <View style={styles.text} />
-        <CustomSlider
+        <ButtonMenu
           theme={theme}
           value={holeScore}
           setValue={setHoleScore}
-          minValue={1}
-          step={1}
-          maxValue={currentGame.mercyRule}
+          range={currentGame.mercyRule}
         />
       </CustomCard>
     </Fragment>

@@ -18,7 +18,9 @@ if (!firebase.apps.length) {
 } else {
   firebase.app();
 }
+
 export const Firebase = firebase;
+export const fieldValues = firebase.firestore.FieldValue;
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 export const functions = firebase.functions();

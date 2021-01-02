@@ -5,7 +5,13 @@ import {
   FirebaseRecaptchaVerifierModal,
   FirebaseRecaptchaBanner,
 } from "expo-firebase-recaptcha";
-import { Firebase, firebaseConfig, auth, firestore } from "../../firebase";
+import {
+  Firebase,
+  firebaseConfig,
+  auth,
+  firestore,
+  storage,
+} from "../../firebase";
 import CustomCard, { ColumnCard } from "../../components/CustomCard";
 import { PhoneField, CodeField } from "../../components/CustomField";
 import CustomButton from "../../components/CustomButton";
@@ -48,13 +54,15 @@ export default function Login() {
           let getURL = "";
           await storage
             .ref()
-            .child(`defaults/defaultImage`)
+            .child(`defaults/defaultImage.png`)
             .getDownloadURL()
             .then((url) => {
               getURL = url;
             });
           docRef.set({
-            friends: [],
+            friends: ["placeholder"],
+            friendsRequested: ["placeholder"],
+            incomingFriendRequests: ["placeholder"],
             groups: [],
             phoneNumber: user.phoneNumber,
             name: "",

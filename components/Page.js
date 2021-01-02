@@ -18,21 +18,28 @@ export default function Page({ navigation, title, children }) {
             <View style={styles.filler} />
             <IconButton
               icon="flag-checkered"
-              size={25}
+              size={20}
               onPress={() => {
                 navigation.navigate("ScoreCard");
               }}
             />
             <IconButton
               icon="view-dashboard"
-              size={25}
+              size={20}
               onPress={() => {
                 navigation.navigate("Dashboard");
               }}
             />
             <IconButton
+              icon="account-group"
+              size={20}
+              onPress={() => {
+                navigation.navigate("Friends");
+              }}
+            />
+            <IconButton
               icon="account-circle"
-              size={25}
+              size={20}
               onPress={() => {
                 navigation.navigate("Profile");
               }}
