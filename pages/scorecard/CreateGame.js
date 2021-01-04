@@ -1,6 +1,12 @@
 import React, { Fragment, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Title, Text, Subheading, Avatar } from "react-native-paper";
+import {
+  Title,
+  Text,
+  Subheading,
+  Avatar,
+  IconButton,
+} from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
 import CustomButton, {
@@ -25,6 +31,7 @@ export default function CreateGame({
   setEnableNewCourseForm,
   theme,
   user,
+  navigation,
 }) {
   const [friendsList, setFriendsList] = useState([]);
   useEffect(() => {
@@ -40,6 +47,11 @@ export default function CreateGame({
       });
     return () => unsubscribeFriends();
   }, []);
+
+  const handleCourseView = (course) => {
+    navigation.navigate("ViewCourse", { course: course });
+  };
+
   return (
     <Fragment>
       <CustomCard>
@@ -58,7 +70,15 @@ export default function CreateGame({
             handlePress={handleCourseSelect}
             index={index}
           >
-            <Title>{course.courseName} </Title>
+            <View style={styles.rowCenter}>
+              <Title>{course.courseName} </Title>
+              <View style={styles.filler} />
+              <IconButton
+                icon="circle-edit-outline"
+                onPress={() => handleCourseView(course)}
+                size={30}
+              />
+            </View>
             <Subheading>{course.numHoles} Holes</Subheading>
           </SelectionButton>
         ))}
@@ -101,7 +121,7 @@ export default function CreateGame({
         </CustomCard>
       )}
       <CustomCard>
-        <Title>Who's Playing?</Title>
+        <Title>2) Who's Playing?</Title>
         {friendsList.map((friend, index) => (
           <SelectionButton
             key={index}

@@ -132,6 +132,7 @@ export default function ScoreCard({ user, theme, navigation }) {
   };
   const handleOldCourse = async () => {
     await createScoreDocument(selectedCourse.id, selectedCourse.numHoles);
+    setSelectedCourse({ id: "" });
   };
   const handleNewCourse = async () => {
     await firestore
@@ -177,6 +178,7 @@ export default function ScoreCard({ user, theme, navigation }) {
     );
   };
   const handleGameEnd = async () => {
+    navigation.navigate("Dashboard");
     await Promise.all(
       currentGame.players.map(async (p) => {
         await p.ref.update({
@@ -184,7 +186,6 @@ export default function ScoreCard({ user, theme, navigation }) {
         });
       })
     );
-    navigation.navigate("Dashboard");
   };
   const handleNextPage = async () => {
     if (!currentGame.gameInProgress) {
@@ -224,6 +225,7 @@ export default function ScoreCard({ user, theme, navigation }) {
             enableNewCourseForm={enableNewCourseForm}
             setEnableNewCourseForm={setEnableNewCourseForm}
             theme={theme}
+            navigation={navigation}
           />
         ) : (
           <Fragment>

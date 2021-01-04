@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 import { Title } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import StatObj, { StatHeader } from "../../components/StatObj";
+import { ResultStatsHeader, ResultStats } from "../../components/PlayerStats";
 export default function ResultsPage({
   user,
   currentGame,
@@ -11,18 +12,18 @@ export default function ResultsPage({
 }) {
   const [gameStats, setGameStats] = useState(null);
   useEffect(() => {
-    setCurrentGame({ ...currentGame, loading: true });
     const pars = currentGame.holes;
     let playerStatsTemplate = {
-      ace: 0,
-      albatross: 0,
-      birdie: 0,
-      par: 0,
-      bogey: 0,
-      doubleBogey: 0,
-      eagle: 0,
-      shots: 0,
-      idealPar: 0,
+      numAce: 0,
+      numAlbatross: 0,
+      numBirdie: 0,
+      numPar: 0,
+      numBogey: 0,
+      numDoubleBogey: 0,
+      numEagle: 0,
+      numShots: 0,
+      numIdealPar: 0,
+      numHoles: currentGame.numHoles,
     };
     let stats = {};
     currentGame.players.forEach((p) => {
@@ -32,20 +33,19 @@ export default function ResultsPage({
       let scores = currentGame.playerScores[key];
       scores.forEach((value, index) => {
         const par = pars[index];
-        if (value === 1) stats[key].ace++;
-        else if (value === par - 3) stats[key].albatross++;
-        else if (value === par - 2) stats[key].eagle++;
-        else if (value === par - 1) stats[key].birdie++;
-        else if (value === par) stats[key].par++;
-        else if (value === par + 1) stats[key].bogey++;
-        else if (value === par + 2) stats[key].doubleBogey++;
-        stats[key].shots += value;
-        stats[key].idealPar += par;
+        if (value === 1) stats[key].numAce++;
+        else if (value === par - 3) stats[key].numAlbatross++;
+        else if (value === par - 2) stats[key].numEagle++;
+        else if (value === par - 1) stats[key].numBirdie++;
+        else if (value === par) stats[key].numPar++;
+        else if (value === par + 1) stats[key].numBogey++;
+        else if (value === par + 2) stats[key].numDoubleBogey++;
+        stats[key].numShots += value;
+        stats[key].numIdealPar += par;
       });
     });
     setGameStats(stats);
     const updateUser = async () => {
-      const scoreID = currentGame.scoreRef.id;
       if (currentGame.firstPlaythrough)
         await currentGame.courseRef.update({
           par: stats[user.id].idealPar,
@@ -79,101 +79,24 @@ export default function ResultsPage({
     setCurrentGame({ ...currentGame, loading: false });
   }, []);
   const sortPlayerByScore = (a, b) => {
-    return gameStats[a.id].shots - gameStats[b.id].shots;
+    return gameStats[a.id].numShots - gameStats[b.id].numShots;
   };
   return (
     <Fragment>
-      {gameStats !== null && (
+      {gameStats && (
         <Fragment>
-          <CustomCard>
-            <StatHeader label="Overall" valueA="#" theme={theme} />
-            <StatObj
-              label="Holes"
-              valueA={currentGame.numHoles}
-              theme={theme}
-            />
-            <StatObj
-              label="Par"
-              valueA={gameStats[user.id].idealPar}
-              theme={theme}
-            />
-          </CustomCard>
+          <ResultStatsHeader
+            theme={theme}
+            numHoles={currentGame.numHoles}
+            numIdealPar={gameStats[user.id].numIdealPar}
+          />
           {currentGame.players.sort(sortPlayerByScore).map((player, key) => (
-            <CustomCard key={key}>
-              <Title>
-                #{key + 1} {player.name ? player.name : player.phoneNumber}
-              </Title>
-              <StatHeader
-                label="Performance"
-                valueA="#"
-                valueB="%"
-                theme={theme}
-              />
-              <StatObj
-                label="Shots/Score"
-                valueA={gameStats[player.id].shots}
-                valueB={(
-                  gameStats[player.id].shots / gameStats[player.id].idealPar
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Ace"
-                valueA={gameStats[player.id].ace}
-                valueB={(
-                  gameStats[player.id].ace / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Albatross"
-                valueA={gameStats[player.id].albatross}
-                valueB={(
-                  gameStats[player.id].albatross / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Eagle"
-                valueA={gameStats[player.id].eagle}
-                valueB={(
-                  gameStats[player.id].eagle / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Birdie"
-                valueA={gameStats[player.id].birdie}
-                valueB={(
-                  gameStats[player.id].birdie / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Par"
-                valueA={gameStats[player.id].par}
-                valueB={(
-                  gameStats[player.id].par / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Bogey"
-                valueA={gameStats[player.id].bogey}
-                valueB={(
-                  gameStats[player.id].bogey / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-              <StatObj
-                label="Double Bogey"
-                valueA={gameStats[player.id].doubleBogey}
-                valueB={(
-                  gameStats[player.id].doubleBogey / currentGame.numHoles
-                ).toFixed(2)}
-                theme={theme}
-              />
-            </CustomCard>
+            <ResultStats
+              pos={key + 1}
+              player={player}
+              theme={theme}
+              stats={gameStats[player.id]}
+            />
           ))}
         </Fragment>
       )}

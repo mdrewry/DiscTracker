@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Fragment } from "react";
 import {
   StyleSheet,
   View,
@@ -9,7 +9,7 @@ import {
 import { Title, Appbar } from "react-native-paper";
 export default function Page({ navigation, title, children, theme, user }) {
   return (
-    <SafeAreaView style={styles.container}>
+    <Fragment>
       <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
         <Appbar.Content
           title={title}
@@ -45,11 +45,16 @@ export default function Page({ navigation, title, children, theme, user }) {
           }}
         />
       </Appbar.Header>
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
-        {children}
-        <View style={styles.marginTop} />
-      </ScrollView>
-    </SafeAreaView>
+      <SafeAreaView style={styles.container}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.main}
+        >
+          {children}
+          <View style={styles.marginTop} />
+        </ScrollView>
+      </SafeAreaView>
+    </Fragment>
   );
 }
 
@@ -82,9 +87,11 @@ export const LoadingPage = ({ theme }) => {
   );
 };
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  main: {
+  container: {
     flex: 1,
+  },
+  main: {
+    minHeight: "100%",
     paddingLeft: 20,
     paddingRight: 20,
   },

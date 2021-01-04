@@ -104,7 +104,11 @@ export default function Friends({ user, theme, navigation }) {
     })[0];
     setQueryResult(match);
   };
-  const handleViewProfile = () => {};
+  const handleViewProfile = (friend) => {
+    navigation.navigate("ViewFriend", {
+      friend: { ...friend, ref: null },
+    });
+  };
   return (
     <Page navigation={navigation} title="Social" user={user} theme={theme}>
       <CustomCard>

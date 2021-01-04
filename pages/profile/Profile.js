@@ -258,7 +258,7 @@ export default function Profile({ user, theme, navigation }) {
 
 const styles = StyleSheet.create({
   titleWrapper: {
-    marginLeft: 40,
+    marginLeft: 20,
   },
   text: {
     marginTop: 20,

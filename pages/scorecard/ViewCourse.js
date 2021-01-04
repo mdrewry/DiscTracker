@@ -1,0 +1,97 @@
+import React, { useState, useEffect, useRef } from "react";
+import { StyleSheet, View } from "react-native";
+import { Title, Text, Subheading } from "react-native-paper";
+import CustomCard from "../../components/CustomCard";
+import CustomField from "../../components/CustomField";
+import CustomButton, { ButtonMenu } from "../../components/CustomButton";
+import Page from "../../components/Page";
+import { firestore } from "../../firebase";
+export default function ViewCourse({ route, user, navigation, theme }) {
+  const course = route.params.course;
+  const [name, setName] = useState(course.courseName);
+  const [mercyRule, setMercyRule] = useState(course.mercyRule);
+  const [save, setSave] = useState(false);
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    if (didMountRef.current) setSave(true);
+    else didMountRef.current = true;
+  }, [name, mercyRule]);
+  const handleUpdateCourse = async () => {
+    await firestore.collection("courses").doc(course.id).update({
+      courseName: name,
+      mercyRule: mercyRule,
+    });
+    navigation.navigate("ScoreCard");
+  };
+  const handleDeleteCourse = async () => {
+    await firestore.collection("courses").doc(course.id).delete();
+    navigation.navigate("ScoreCard");
+  };
+  return (
+    <Page
+      navigation={navigation}
+      theme={theme}
+      user={user}
+      title="Viewing Course"
+    >
+      <CustomCard>
+        <Title>{course.courseName}</Title>
+        <View style={styles.rowCenter}>
+          <Subheading>{course.numHoles} Holes</Subheading>
+          <View style={styles.filler} />
+          <Subheading>Par {course.par}</Subheading>
+        </View>
+      </CustomCard>
+      <CustomCard>
+        <Title>Edit Course</Title>
+        <Text style={styles.text}>Name</Text>
+        <CustomField
+          value={name}
+          setValue={setName}
+          placeholder="Markham Park"
+          editable={true}
+          autoFocus={false}
+        />
+        <Text style={styles.text}>Mercy Rule</Text>
+        <ButtonMenu
+          range={8}
+          value={mercyRule}
+          setValue={setMercyRule}
+          theme={theme}
+        />
+      </CustomCard>
+      <View style={styles.filler} />
+      <CustomCard>
+        <CustomButton
+          text={save ? "Save" : "Saved!"}
+          handlePress={handleUpdateCourse}
+          disabled={!save}
+        />
+        <View style={styles.text} />
+        <CustomButton text="Delete Course" handlePress={handleDeleteCourse} />
+      </CustomCard>
+    </Page>
+  );
+}
+
+const styles = StyleSheet.create({
+  text: {
+    marginTop: 5,
+  },
+  middleText: {
+    marginTop: 10,
+    marginBottom: 10,
+    alignSelf: "center",
+  },
+  filler: {
+    flexGrow: 1,
+  },
+  rowCenter: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  buttonSpacer: {
+    width: 20,
+  },
+});

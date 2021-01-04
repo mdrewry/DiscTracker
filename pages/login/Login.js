@@ -15,7 +15,7 @@ import {
 import CustomCard, { ColumnCard } from "../../components/CustomCard";
 import { PhoneField, CodeField } from "../../components/CustomField";
 import CustomButton from "../../components/CustomButton";
-export default function Login() {
+export default function Login({ setUser }) {
   const captchaRef = useRef(null);
   const [phoneNumberDisplay, setPhoneNumberDisplay] = useState();
   const [phoneNumber, setPhoneNumber] = useState();
@@ -32,6 +32,12 @@ export default function Login() {
         captchaRef.current
       );
       setVerificationID(verificationID);
+      if (phoneNumber.length !== 12)
+        setMessage({
+          text:
+            "Error processing phone number. Make sure to include the country code (1 for US)",
+          error: true,
+        });
       setMessage({
         text: "Verification code has been sent to your phone.",
         error: false,
@@ -46,6 +52,7 @@ export default function Login() {
         verificationID,
         verificationCode
       );
+      setUser({ loading: true, loggedIn: false });
       await auth.signInWithCredential(credential).then(async (response) => {
         const { user } = response;
         const docRef = firestore.collection("users").doc(user.uid);
@@ -83,6 +90,8 @@ export default function Login() {
             },
             currentGame: "",
             updateGameToggle: false,
+            loggedIn: true,
+            loading: false,
           });
         }
         setMessage({
@@ -91,6 +100,7 @@ export default function Login() {
         });
       });
     } catch (error) {
+      setUser({ loading: false, loggedIn: false });
       setMessage({ text: error.message, error: true });
     }
   };

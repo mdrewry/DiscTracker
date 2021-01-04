@@ -1,5 +1,4 @@
 import React, { useState, useEffect, Fragment } from "react";
-import { View, StyleSheet } from "react-native";
 import { DefaultTheme, Provider as PaperProvider } from "react-native-paper";
 import { LogBox } from "react-native";
 import _ from "lodash";
@@ -11,7 +10,9 @@ import Login from "./pages/login/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
 import Profile from "./pages/profile/Profile";
 import ScoreCard from "./pages/scorecard/ScoreCard";
+import ViewCourse from "./pages/scorecard/ViewCourse";
 import Friends from "./pages/friends/Friends";
+import ViewFriend from "./pages/friends/ViewFriend";
 const Stack = createStackNavigator();
 LogBox.ignoreAllLogs(true);
 const _console = _.clone(console);
@@ -37,12 +38,12 @@ const theme = {
 export default function App() {
   const [user, setUser] = useState({ loading: true, loggedIn: false });
   useEffect(() => {
-    auth.onAuthStateChanged(async (user) => {
+    auth.onAuthStateChanged((user) => {
       if (user) {
         const docRef = firestore.collection("users").doc(user.uid);
-        const unsubscribeUser = docRef.onSnapshot(async (snapshot) => {
+        const unsubscribeUser = docRef.onSnapshot((snapshot) => {
           const userData = { ...snapshot.data(), id: user.uid };
-          setUser({ ...userData, loading: false, loggedIn: true, ref: docRef });
+          setUser({ ...userData, ref: docRef });
         });
         return () => unsubscribeUser();
       } else {
@@ -55,7 +56,7 @@ export default function App() {
       {user.loading ? (
         <LoadingPage theme={theme} />
       ) : (
-        <View style={styles.container}>
+        <Fragment>
           {user.loggedIn ? (
             <NavigationContainer>
               <Stack.Navigator
@@ -76,22 +77,26 @@ export default function App() {
                     <ScoreCard {...props} user={user} theme={theme} />
                   )}
                 </Stack.Screen>
+                <Stack.Screen name="ViewCourse">
+                  {(props) => (
+                    <ViewCourse {...props} user={user} theme={theme} />
+                  )}
+                </Stack.Screen>
                 <Stack.Screen name="Friends">
                   {(props) => <Friends {...props} user={user} theme={theme} />}
+                </Stack.Screen>
+                <Stack.Screen name="ViewFriend">
+                  {(props) => (
+                    <ViewFriend {...props} user={user} theme={theme} />
+                  )}
                 </Stack.Screen>
               </Stack.Navigator>
             </NavigationContainer>
           ) : (
-            <Login />
+            <Login setUser={setUser} />
           )}
-        </View>
+        </Fragment>
       )}
     </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
