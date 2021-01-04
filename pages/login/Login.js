@@ -60,6 +60,7 @@ export default function Login() {
               getURL = url;
             });
           docRef.set({
+            admin: false,
             friends: ["placeholder"],
             friendsRequested: ["placeholder"],
             incomingFriendRequests: ["placeholder"],
@@ -81,6 +82,7 @@ export default function Login() {
               numAce: 0,
             },
             currentGame: "",
+            updateGameToggle: false,
           });
         }
         setMessage({

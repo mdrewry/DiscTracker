@@ -35,33 +35,28 @@ const theme = {
 };
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({ loading: true, loggedIn: false });
   useEffect(() => {
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const docRef = firestore.collection("users").doc(user.uid);
         const unsubscribeUser = docRef.onSnapshot(async (snapshot) => {
           const userData = { ...snapshot.data(), id: user.uid };
-          setUser({ ...userData, ref: docRef });
+          setUser({ ...userData, loading: false, loggedIn: true, ref: docRef });
         });
-        setLoading(false);
         return () => unsubscribeUser();
       } else {
-        setUser(null);
-        setLoading(false);
+        setUser({ loading: false, loggedIn: false });
       }
     });
   }, []);
   return (
     <PaperProvider theme={theme}>
-      {loading ? (
+      {user.loading ? (
         <LoadingPage theme={theme} />
       ) : (
         <View style={styles.container}>
-          {!user || user.stats === undefined ? (
-            <Login />
-          ) : (
+          {user.loggedIn ? (
             <NavigationContainer>
               <Stack.Navigator
                 screenOptions={{
@@ -74,9 +69,7 @@ export default function App() {
                   )}
                 </Stack.Screen>
                 <Stack.Screen name="Profile">
-                  {(props) => (
-                    <Profile {...props} user={user} setUser={setUser} />
-                  )}
+                  {(props) => <Profile {...props} user={user} theme={theme} />}
                 </Stack.Screen>
                 <Stack.Screen name="ScoreCard">
                   {(props) => (
@@ -88,6 +81,8 @@ export default function App() {
                 </Stack.Screen>
               </Stack.Navigator>
             </NavigationContainer>
+          ) : (
+            <Login />
           )}
         </View>
       )}

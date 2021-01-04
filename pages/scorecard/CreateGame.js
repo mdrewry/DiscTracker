@@ -1,6 +1,6 @@
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Title, Text, Subheading } from "react-native-paper";
+import { Title, Text, Subheading, Avatar } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
 import CustomButton, {
@@ -8,10 +8,13 @@ import CustomButton, {
   ButtonMenu,
 } from "../../components/CustomButton";
 import CustomSlider from "../../components/CustomSlider";
-export default function PageOne({
+import { firestore, Firebase } from "../../firebase";
+export default function CreateGame({
   courses,
   selectedCourse,
   handleCourseSelect,
+  handleFriendSelect,
+  players,
   courseName,
   setCourseName,
   courseNumHoles,
@@ -21,7 +24,22 @@ export default function PageOne({
   enableNewCourseForm,
   setEnableNewCourseForm,
   theme,
+  user,
 }) {
+  const [friendsList, setFriendsList] = useState([]);
+  useEffect(() => {
+    const unsubscribeFriends = firestore
+      .collection("users")
+      .where(Firebase.firestore.FieldPath.documentId(), "in", user.friends)
+      .onSnapshot((snapshot) => {
+        setFriendsList(
+          snapshot.docs.map((doc) => {
+            return { ...doc.data(), id: doc.id, ref: doc.ref };
+          })
+        );
+      });
+    return () => unsubscribeFriends();
+  }, []);
   return (
     <Fragment>
       <CustomCard>
@@ -82,6 +100,30 @@ export default function PageOne({
           />
         </CustomCard>
       )}
+      <CustomCard>
+        <Title>Who's Playing?</Title>
+        {friendsList.map((friend, index) => (
+          <SelectionButton
+            key={index}
+            style={{
+              backgroundColor: `${
+                players.some((p) => p.id === friend.id)
+                  ? theme.colors.accent
+                  : theme.colors.primary
+              }`,
+              ...styles.surface,
+            }}
+            handlePress={handleFriendSelect}
+            index={friend}
+          >
+            <View style={styles.rowCenter}>
+              <Avatar.Image size={50} source={{ uri: friend.imageURL }} />
+              <View style={styles.buttonSpacer} />
+              <Title>{friend.name ? friend.name : friend.phoneNumber}</Title>
+            </View>
+          </SelectionButton>
+        ))}
+      </CustomCard>
     </Fragment>
   );
 }

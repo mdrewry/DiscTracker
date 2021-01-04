@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   View,
@@ -6,47 +6,45 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
-import { Title, IconButton } from "react-native-paper";
-import CustomCard from "./CustomCard";
-export default function Page({ navigation, title, children }) {
+import { Title, Appbar } from "react-native-paper";
+export default function Page({ navigation, title, children, theme, user }) {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.appBarWrapper}>
-        <CustomCard cardStyle={styles.appBarCard}>
-          <View style={styles.appbar}>
-            <Title style={styles.titleMargin}>{title}</Title>
-            <View style={styles.filler} />
-            <IconButton
-              icon="flag-checkered"
-              size={20}
-              onPress={() => {
-                navigation.navigate("ScoreCard");
-              }}
-            />
-            <IconButton
-              icon="view-dashboard"
-              size={20}
-              onPress={() => {
-                navigation.navigate("Dashboard");
-              }}
-            />
-            <IconButton
-              icon="account-group"
-              size={20}
-              onPress={() => {
-                navigation.navigate("Friends");
-              }}
-            />
-            <IconButton
-              icon="account-circle"
-              size={20}
-              onPress={() => {
-                navigation.navigate("Profile");
-              }}
-            />
-          </View>
-        </CustomCard>
-      </View>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.Content
+          title={title}
+          subtitle={user.name ? user.name : user.phoneNumber}
+          subtitleStyle={{ marginBottom: 10 }}
+        />
+        <Appbar.Action
+          icon="flag-checkered"
+          size={20}
+          onPress={() => {
+            navigation.navigate("ScoreCard");
+          }}
+        />
+        <Appbar.Action
+          icon="view-dashboard"
+          size={20}
+          onPress={() => {
+            navigation.navigate("Dashboard");
+          }}
+        />
+        <Appbar.Action
+          icon="account-group"
+          size={20}
+          onPress={() => {
+            navigation.navigate("Friends");
+          }}
+        />
+        <Appbar.Action
+          icon="account-circle"
+          size={20}
+          onPress={() => {
+            navigation.navigate("Profile");
+          }}
+        />
+      </Appbar.Header>
       <ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
         {children}
         <View style={styles.marginTop} />
@@ -64,13 +62,21 @@ export const PageCenter = ({ children }) => {
 };
 
 export const LoadingPage = ({ theme }) => {
+  const messages = [
+    "Don't Be a Dirty Discer",
+    "Even Berry Schultz Loses Discs",
+    "The Arborist Fears No Tree",
+  ];
+  const [dispMessage, setDispMessage] = useState(
+    messages[Math.floor(Math.random() * Math.floor(messages.length))]
+  );
   return (
     <View style={styles.container}>
       <View
         style={{ ...styles.centerMain, backgroundColor: theme.colors.surface }}
       >
         <ActivityIndicator size="large" color={theme.colors.accent} />
-        <Title>Dont Be a Dirty Discer</Title>
+        <Title>{dispMessage}</Title>
       </View>
     </View>
   );
@@ -81,21 +87,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingLeft: 20,
     paddingRight: 20,
-  },
-  appBarWrapper: {
-    paddingTop: 20,
-    paddingLeft: 20,
-    paddingRight: 20,
-  },
-  appBarCard: {
-    borderBottomLeftRadius: 2,
-    borderBottomRightRadius: 2,
-  },
-  appbar: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
   },
   marginTop: {
     marginTop: 20,

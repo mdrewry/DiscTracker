@@ -67,6 +67,7 @@ export const ButtonMenu = ({ value, setValue, range, theme }) => {
     <View style={styles.buttonMenu}>
       {arr.map((val, index) => (
         <SelectionButton
+          key={index}
           handlePress={handlePress}
           index={index + 1}
           disabled={value - 1 === index}
@@ -74,6 +75,37 @@ export const ButtonMenu = ({ value, setValue, range, theme }) => {
             ...styles.buttonStyle,
             backgroundColor:
               value - 1 !== index ? theme.colors.accent : theme.colors.primary,
+          }}
+        >
+          <Text>{index + 1}</Text>
+        </SelectionButton>
+      ))}
+    </View>
+  );
+};
+
+export const ButtonMenuGroup = ({ value, setValue, pos, range, theme }) => {
+  const arr = new Array(range).fill(0);
+  const handlePress = (index) => {
+    let curr = value;
+    curr[pos.id] = index;
+
+    setValue({ ...curr });
+  };
+  return (
+    <View style={styles.buttonMenu}>
+      {arr.map((val, index) => (
+        <SelectionButton
+          key={index}
+          handlePress={handlePress}
+          index={index + 1}
+          disabled={value[pos.id] - 1 === index}
+          style={{
+            ...styles.buttonStyle,
+            backgroundColor:
+              value[pos.id] - 1 !== index
+                ? theme.colors.accent
+                : theme.colors.primary,
           }}
         >
           <Text>{index + 1}</Text>

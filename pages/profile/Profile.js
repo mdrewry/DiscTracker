@@ -2,18 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { Keyboard, StyleSheet, View } from "react-native";
 import { Title, Avatar, Text, Subheading } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
-import { auth, storage } from "../../firebase";
+import { auth, storage, firestore } from "../../firebase";
 import Page from "../../components/Page";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
 import CustomButton from "../../components/CustomButton";
 import CustomDialog from "../../components/CustomDialog";
-export default function Profile({ user, setUser, theme, navigation }) {
+export default function Profile({ user, theme, navigation }) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
   const [image, setImage] = useState(user.imageURL);
   const [save, setSave] = useState(false);
   const [openResetForm, setOpenResetForm] = useState(false);
+  const [openAdminResetForm, setOpenAdminResetForm] = useState(false);
   const [openSignOutForm, setOpenSignOutForm] = useState(false);
   const didMountRef = useRef(false);
   useEffect(() => {
@@ -55,6 +56,9 @@ export default function Profile({ user, setUser, theme, navigation }) {
   const handleToggleReset = () => {
     setOpenResetForm((curr) => !curr);
   };
+  const handleToggleAdminReset = () => {
+    setOpenAdminResetForm((curr) => !curr);
+  };
   const handleToggleSignoutForm = () => {
     setOpenSignOutForm((curr) => !curr);
   };
@@ -74,6 +78,34 @@ export default function Profile({ user, setUser, theme, navigation }) {
       },
     });
     handleToggleReset();
+  };
+  const adminResetData = async () => {
+    const scoresSnapshot = await firestore.collection("scores").get();
+    await Promise.all(
+      scoresSnapshot.docs.map(async (doc) => {
+        await doc.ref.delete();
+      })
+    );
+    const usersSnapshot = await firestore.collection("users").get();
+    await Promise.all(
+      usersSnapshot.docs.map(async (doc) => {
+        await doc.ref.update({
+          stats: {
+            numGames: 0,
+            numHoles: 0,
+            numShots: 0,
+            numPar: 0,
+            numBirdie: 0,
+            numEagle: 0,
+            numAlbatross: 0,
+            numBogey: 0,
+            numDoubleBogey: 0,
+            numAce: 0,
+          },
+        });
+      })
+    );
+    handleToggleAdminReset();
   };
   const upload = async (uri) => {
     let imageBlob = null;
@@ -105,7 +137,7 @@ export default function Profile({ user, setUser, theme, navigation }) {
     }
   };
   return (
-    <Page navigation={navigation} title="Profile">
+    <Page navigation={navigation} title="Profile" user={user} theme={theme}>
       <CustomCard>
         <View style={styles.rowCenter}>
           <Avatar.Image
@@ -195,6 +227,31 @@ export default function Profile({ user, setUser, theme, navigation }) {
           <CustomButton text="Confirm" handlePress={resetProfile} />
         </CustomDialog>
       </CustomCard>
+      {user.admin && (
+        <CustomCard>
+          <Subheading>Admin Settings</Subheading>
+          <View style={styles.text} />
+          <CustomButton
+            text="Reset All Stats/Scores"
+            handlePress={handleToggleAdminReset}
+            disabled={false}
+          />
+          <CustomDialog
+            visible={openAdminResetForm}
+            setVisible={handleToggleAdminReset}
+            type="Attention"
+            prompt="You are about to reset the database scores and user stats."
+          >
+            <CustomButton
+              text="Cancel"
+              handlePress={handleToggleAdminReset}
+              disabled={false}
+            />
+            <View style={styles.buttonSpacer} />
+            <CustomButton text="Confirm" handlePress={adminResetData} />
+          </CustomDialog>
+        </CustomCard>
+      )}
     </Page>
   );
 }

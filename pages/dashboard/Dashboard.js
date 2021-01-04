@@ -7,7 +7,7 @@ import StatObj, { StatHeader } from "../../components/StatObj";
 export default function Dashboard({ user, theme, navigation }) {
   const canDivide = user.stats.numGames > 0;
   return (
-    <Page navigation={navigation} title="Dashboard">
+    <Page navigation={navigation} title="Dashboard" user={user} theme={theme}>
       <CustomCard>
         <StatHeader label="Overall" valueA="#" theme={theme} />
         <StatObj label="Games" valueA={user.stats.numGames} theme={theme} />

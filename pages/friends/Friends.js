@@ -106,7 +106,7 @@ export default function Friends({ user, theme, navigation }) {
   };
   const handleViewProfile = () => {};
   return (
-    <Page navigation={navigation} title="Friends">
+    <Page navigation={navigation} title="Social" user={user} theme={theme}>
       <CustomCard>
         <Title>Find Friends</Title>
         <PhoneField value={search} setValue={setSearch} />
@@ -129,6 +129,18 @@ export default function Friends({ user, theme, navigation }) {
         )}
       </CustomCard>
       <CustomCard>
+        <Title>Friends</Title>
+        {friendsList.map((friend, index) => (
+          <FriendObjAction
+            key={index}
+            friend={friend}
+            theme={theme}
+            handlePress={handleViewProfile}
+            text="View Profile"
+          />
+        ))}
+      </CustomCard>
+      <CustomCard>
         <Title>Incoming Friend Requests</Title>
         {requests.map((friendRequest, index) => (
           <FriendRequestObj
@@ -139,18 +151,6 @@ export default function Friends({ user, theme, navigation }) {
             handlePressB={handleFriendAccept}
             aText="Reject"
             bText="Accept"
-          />
-        ))}
-      </CustomCard>
-      <CustomCard>
-        <Title>Friends</Title>
-        {friendsList.map((friend, index) => (
-          <FriendObjAction
-            key={index}
-            friend={friend}
-            theme={theme}
-            handlePress={handleViewProfile}
-            text="View Profile"
           />
         ))}
       </CustomCard>

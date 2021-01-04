@@ -2,8 +2,7 @@ import React, { Fragment } from "react";
 import { StyleSheet, View } from "react-native";
 import { Title, Subheading } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
-import CustomSlider from "../../components/CustomSlider";
-import { ButtonMenu } from "../../components/CustomButton";
+import { ButtonMenu, ButtonMenuGroup } from "../../components/CustomButton";
 export default function PageN({
   page,
   index,
@@ -14,18 +13,18 @@ export default function PageN({
   holePar,
   setHolePar,
 }) {
-  if (page !== index + 1) {
+  if (page !== index) {
     return <View />;
   }
   return (
     <Fragment>
       <CustomCard>
-        <Title>Hole {page}</Title>
+        <Title>Hole {page + 1}</Title>
         <View style={styles.rowCenter}>
           <Subheading>{currentGame.courseName}</Subheading>
           <View style={styles.filler} />
           {!currentGame.firstPlaythrough && (
-            <Subheading>Par {currentGame.holes[page - 1]}</Subheading>
+            <Subheading>Par {currentGame.holes[page]}</Subheading>
           )}
         </View>
       </CustomCard>
@@ -45,16 +44,21 @@ export default function PageN({
           />
         </CustomCard>
       )}
-      <CustomCard>
-        <Title>Score</Title>
-        <View style={styles.text} />
-        <ButtonMenu
-          theme={theme}
-          value={holeScore}
-          setValue={setHoleScore}
-          range={currentGame.mercyRule}
-        />
-      </CustomCard>
+      {currentGame.players.map((player, key) => (
+        <CustomCard key={key}>
+          <Title>
+            {player.name ? player.name : player.phoneNumber}'s Score
+          </Title>
+          <View style={styles.text} />
+          <ButtonMenuGroup
+            theme={theme}
+            value={holeScore}
+            setValue={setHoleScore}
+            pos={player}
+            range={currentGame.mercyRule}
+          />
+        </CustomCard>
+      ))}
     </Fragment>
   );
 }
