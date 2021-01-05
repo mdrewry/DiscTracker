@@ -76,13 +76,11 @@ export const LoadingPage = ({ theme }) => {
     messages[Math.floor(Math.random() * Math.floor(messages.length))]
   );
   return (
-    <View style={styles.container}>
-      <View
-        style={{ ...styles.centerMain, backgroundColor: theme.colors.surface }}
-      >
-        <ActivityIndicator size="large" color={theme.colors.accent} />
-        <Title>{dispMessage}</Title>
-      </View>
+    <View
+      style={{ ...styles.centerMain, backgroundColor: theme.colors.surface }}
+    >
+      <ActivityIndicator size="large" color={theme.colors.accent} />
+      <Title>{dispMessage}</Title>
     </View>
   );
 };

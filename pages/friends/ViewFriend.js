@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Title, Text, Subheading, Avatar } from "react-native-paper";
+import { Title, Subheading, Avatar } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
-import CustomField from "../../components/CustomField";
-import CustomButton, { ButtonMenu } from "../../components/CustomButton";
+import CustomButton from "../../components/CustomButton";
 import CustomDialog from "../../components/CustomDialog";
 import Page from "../../components/Page";
 import { firestore, fieldValues } from "../../firebase";

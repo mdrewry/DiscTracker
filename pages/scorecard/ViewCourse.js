@@ -4,6 +4,7 @@ import { Title, Text, Subheading } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import CustomField from "../../components/CustomField";
 import CustomButton, { ButtonMenu } from "../../components/CustomButton";
+import CustomDialog from "../../components/CustomDialog";
 import Page from "../../components/Page";
 import { firestore } from "../../firebase";
 export default function ViewCourse({ route, user, navigation, theme }) {
@@ -11,6 +12,7 @@ export default function ViewCourse({ route, user, navigation, theme }) {
   const [name, setName] = useState(course.courseName);
   const [mercyRule, setMercyRule] = useState(course.mercyRule);
   const [save, setSave] = useState(false);
+  const [openDeleteForm, setOpenDeleteForm] = useState(false);
   const didMountRef = useRef(false);
   useEffect(() => {
     if (didMountRef.current) setSave(true);
@@ -23,7 +25,19 @@ export default function ViewCourse({ route, user, navigation, theme }) {
     });
     navigation.navigate("ScoreCard");
   };
+  const toggleDeleteCourse = () => {
+    setOpenDeleteForm((curr) => !curr);
+  };
   const handleDeleteCourse = async () => {
+    const scoresSnapshot = await firestore
+      .collection("scores")
+      .where("courseID", "==", course.id)
+      .get();
+    await Promise.all(
+      scoresSnapshot.docs.map(async (doc) => {
+        await doc.ref.delete();
+      })
+    );
     await firestore.collection("courses").doc(course.id).delete();
     navigation.navigate("ScoreCard");
   };
@@ -68,7 +82,21 @@ export default function ViewCourse({ route, user, navigation, theme }) {
           disabled={!save}
         />
         <View style={styles.text} />
-        <CustomButton text="Delete Course" handlePress={handleDeleteCourse} />
+        <CustomButton text="Delete Course" handlePress={toggleDeleteCourse} />
+        <CustomDialog
+          visible={openDeleteForm}
+          setVisible={toggleDeleteCourse}
+          type="Attention"
+          prompt="Deleting this course will also delete all scorecards assocated with it. This will not impact your overall stats."
+        >
+          <CustomButton
+            text="Cancel"
+            handlePress={toggleDeleteCourse}
+            disabled={false}
+          />
+          <View style={styles.buttonSpacer} />
+          <CustomButton text="Confirm" handlePress={handleDeleteCourse} />
+        </CustomDialog>
       </CustomCard>
     </Page>
   );

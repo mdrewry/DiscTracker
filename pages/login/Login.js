@@ -18,14 +18,12 @@ import CustomButton from "../../components/CustomButton";
 export default function Login({ setUser }) {
   const captchaRef = useRef(null);
   const [phoneNumberDisplay, setPhoneNumberDisplay] = useState();
-  const [phoneNumber, setPhoneNumber] = useState();
   const [verificationCode, setVerificationCode] = useState();
   const [verificationID, setVerificationID] = useState();
   const [message, setMessage] = useState();
   const sendVerificationCode = async () => {
     try {
       const phoneNumber = "+" + phoneNumberDisplay.replace(/[- )(]/g, "");
-      setPhoneNumber(phoneNumber);
       const phoneProvider = new Firebase.auth.PhoneAuthProvider();
       const verificationID = await phoneProvider.verifyPhoneNumber(
         phoneNumber,
@@ -86,6 +84,7 @@ export default function Login({ setUser }) {
               numAlbatross: 0,
               numBogey: 0,
               numDoubleBogey: 0,
+              numTripleBogey: 0,
               numAce: 0,
             },
             currentGame: "",
@@ -95,7 +94,7 @@ export default function Login({ setUser }) {
           });
         }
         setMessage({
-          text: "Phone Authentication Successful 👍",
+          text: "Phone Authentication Successful",
           error: false,
         });
       });

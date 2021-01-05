@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Fragment } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { StyleSheet, View } from "react-native";
 import { firestore, Firebase } from "../../firebase";
 import Page, { LoadingPage } from "../../components/Page";
@@ -30,65 +30,70 @@ export default function ScoreCard({ user, theme, navigation }) {
         const coursesRef = firestore
           .collection("courses")
           .where("usedBy", "array-contains", user.id);
-        const coursesSnapshot = await coursesRef.get();
-        if (coursesSnapshot.docs.length === 0) setEnableNewCourseForm(true);
-        setCourses(
-          coursesSnapshot.docs.map((doc) => {
-            return { ...doc.data(), id: doc.id };
-          })
-        );
+        const unsubscribeCourses = coursesRef.onSnapshot((snapshot) => {
+          if (snapshot.docs.length === 0) setEnableNewCourseForm(true);
+          setCourses(
+            snapshot.docs.map((doc) => {
+              return { ...doc.data(), id: doc.id };
+            })
+          );
+        });
         setPage(0);
         setButtonText("Begin Game");
         setCurrentGame({ loading: false, gameInProgress: false });
+        return () => unsubscribeCourses();
       } else {
         const scoreRef = firestore.collection("scores").doc(user.currentGame);
-        const scoreData = (await scoreRef.get()).data();
-        const courseRef = firestore
-          .collection("courses")
-          .doc(scoreData.courseID);
-        const courseData = (await courseRef.get()).data();
-        let players = [];
-        let scoreSheet = {};
-        const playersRef = firestore
-          .collection("users")
-          .where(
-            Firebase.firestore.FieldPath.documentId(),
-            "in",
-            scoreData.players
-          );
-        const playersDocs = await playersRef.get();
-        players = playersDocs.docs.map((doc) => {
-          scoreSheet[doc.id] = courseData.holes[scoreData.currentHole];
-          return { ...doc.data(), id: doc.id, ref: doc.ref };
+        const unsubscribeScore = scoreRef.onSnapshot(async (doc) => {
+          const scoreData = doc.data();
+          const courseRef = firestore
+            .collection("courses")
+            .doc(scoreData.courseID);
+          const courseData = (await courseRef.get()).data();
+          let scoreSheet = {};
+          const players = (
+            await firestore
+              .collection("users")
+              .where(
+                Firebase.firestore.FieldPath.documentId(),
+                "in",
+                scoreData.players
+              )
+              .get()
+          ).docs.map((doc) => {
+            scoreSheet[doc.id] = courseData.holes[scoreData.currentHole];
+            return { ...doc.data(), id: doc.id, ref: doc.ref };
+          });
+          const currentGame = {
+            ...scoreData,
+            ...courseData,
+            scoreRef: doc.ref,
+            courseRef,
+            players: players,
+            loading: false,
+            gameInProgress: true,
+          };
+          setHoleScore(scoreSheet);
+          setPage(currentGame.currentHole);
+          setHeaderText("Playing Game");
+          setButtonText("Next Hole");
+          if (currentGame.currentHole < currentGame.numHoles)
+            setHolePar(
+              currentGame.firstPlaythrough ? 3 : currentGame.holes[page].par
+            );
+          if (currentGame.currentHole === currentGame.numHoles - 1)
+            setButtonText("End Game");
+          else if (currentGame.currentHole === currentGame.numHoles) {
+            setHeaderText("Viewing Results");
+            setButtonText("Exit to Dashboard");
+          }
+          setCurrentGame(currentGame);
         });
-        const currentGame = {
-          ...scoreData,
-          ...courseData,
-          scoreRef,
-          courseRef,
-          players: players,
-          loading: false,
-          gameInProgress: true,
-        };
-        setHoleScore(scoreSheet);
-        setCurrentGame(currentGame);
-        setPage(currentGame.currentHole);
-        setHeaderText("Playing Game");
-        setButtonText("Next Hole");
-        if (currentGame.currentHole < currentGame.numHoles)
-          setHolePar(
-            currentGame.firstPlaythrough ? 3 : currentGame.holes[page].par
-          );
-        if (currentGame.currentHole === currentGame.numHoles - 1)
-          setButtonText("End Game");
-        else if (currentGame.currentHole === currentGame.numHoles) {
-          setHeaderText("Viewing Results");
-          setButtonText("Exit to Dashboard");
-        }
+        return () => unsubscribeScore();
       }
     };
     getData();
-  }, [user]);
+  }, [user.currentGame]);
   const handleCourseSelect = (index) => {
     setSelectedCourse(courses[index]);
   };
@@ -169,13 +174,6 @@ export default function ScoreCard({ user, theme, navigation }) {
       playerScores: currScores,
       currentHole: page + 1,
     });
-    await Promise.all(
-      currentGame.players.map(async (p) => {
-        await p.ref.update({
-          updateGameToggle: !p.updateGameToggle,
-        });
-      })
-    );
   };
   const handleGameEnd = async () => {
     navigation.navigate("Dashboard");

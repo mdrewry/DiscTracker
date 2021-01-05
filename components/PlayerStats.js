@@ -61,6 +61,16 @@ export const StandardStats = ({ stats, theme, canDivide }) => {
         }
         theme={theme}
       />
+      <StatObj
+        label="Triple Bogey"
+        valueA={stats.numTripleBogey}
+        valueB={
+          canDivide
+            ? (stats.numTripleBogey / stats.numHoles).toFixed(2)
+            : "0.00"
+        }
+        theme={theme}
+      />
     </Fragment>
   );
 };

@@ -36,14 +36,7 @@ export default function Profile({ user, theme, navigation }) {
     }
   }, [name, email]);
   const handleLogout = async () => {
-    await auth
-      .signOut()
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-      });
+    await auth.signOut();
   };
   const saveProfile = async () => {
     await user.ref.update({
@@ -74,6 +67,7 @@ export default function Profile({ user, theme, navigation }) {
         numAlbatross: 0,
         numBogey: 0,
         numDoubleBogey: 0,
+        numTripleBogey: 0,
         numAce: 0,
       },
     });
@@ -100,6 +94,7 @@ export default function Profile({ user, theme, navigation }) {
             numAlbatross: 0,
             numBogey: 0,
             numDoubleBogey: 0,
+            numTripleBogey: 0,
             numAce: 0,
           },
         });

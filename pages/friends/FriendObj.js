@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { Title, Avatar, IconButton } from "react-native-paper";
+import { Title, Avatar } from "react-native-paper";
 import CustomCard from "../../components/CustomCard";
 import CustomButton, {
   SelectionButtonDefault,
@@ -80,7 +80,6 @@ export const FriendRequestPending = ({ friend, theme }) => {
 };
 
 const styles = StyleSheet.create({
-  friendCard: {},
   filler: {
     flexGrow: 1,
   },
