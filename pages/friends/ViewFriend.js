@@ -32,7 +32,7 @@ export default function ViewFriend({ route, user, navigation, theme }) {
       user={user}
       title="Viewing Friend"
     >
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <View style={styles.rowCenter}>
           <Avatar.Image size={90} source={{ uri: friend.imageURL }} />
           <View style={styles.titleWrapper}>
@@ -43,7 +43,7 @@ export default function ViewFriend({ route, user, navigation, theme }) {
       </CustomCard>
       <PlayerStatsHeader stats={friend.stats} theme={theme} />
       <PlayerStats stats={friend.stats} theme={theme} />
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <CustomButton
           text="Remove Friend"
           handlePress={handleToggleRemoveFriend}

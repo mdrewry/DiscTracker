@@ -18,7 +18,7 @@ export default function PageN({
   }
   return (
     <Fragment>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>Hole {page + 1}</Title>
         <View style={styles.rowCenter}>
           <Subheading>{currentGame.courseName}</Subheading>
@@ -29,7 +29,7 @@ export default function PageN({
         </View>
       </CustomCard>
       {currentGame.firstPlaythrough && (
-        <CustomCard>
+        <CustomCard  theme={theme}>
           <View style={styles.rowCenter}>
             <Title>Par</Title>
             <View style={styles.filler} />
@@ -45,7 +45,7 @@ export default function PageN({
         </CustomCard>
       )}
       {currentGame.players.map((player, key) => (
-        <CustomCard key={key}>
+        <CustomCard  theme={theme} key={key}>
           <Title>
             {player.name ? player.name : player.phoneNumber}'s Score
           </Title>

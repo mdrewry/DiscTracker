@@ -2,6 +2,7 @@ import React, { useState, useEffect, Fragment } from "react";
 import { StyleSheet, View } from "react-native";
 import { firestore, Firebase } from "../../firebase";
 import Page, { LoadingPage } from "../../components/Page";
+import CustomDialog from "../../components/CustomDialog";
 import CustomCard from "../../components/CustomCard";
 import CustomButton from "../../components/CustomButton";
 import CreateGame from "./CreateGame";
@@ -24,6 +25,7 @@ export default function ScoreCard({ user, theme, navigation }) {
   const [holePar, setHolePar] = useState(3);
   const [buttonText, setButtonText] = useState("Begin Game");
   const [headerText, setHeaderText] = useState("Create Game");
+  const [dialogVisible, setDialogVisible] = useState(false);
   useEffect(() => {
     const getData = async () => {
       if (user.currentGame === "") {
@@ -96,6 +98,9 @@ export default function ScoreCard({ user, theme, navigation }) {
   }, [user.currentGame]);
   const handleCourseSelect = (index) => {
     setSelectedCourse(courses[index]);
+  };
+  const handleEndDialogToggle = () => {
+    setDialogVisible((curr) => !curr);
   };
   const handleFriendSelect = async (player) => {
     const index = players.findIndex((p) => p.id === player.id);
@@ -175,6 +180,19 @@ export default function ScoreCard({ user, theme, navigation }) {
       currentHole: page + 1,
     });
   };
+  const updateDNFScores = async () => {
+    if (currentGame.firstPlaythrough) {
+      let holeValues = currentGame.holes;
+      holeValues[page] = holePar;
+      for (let i = page + 1; i < currentGame.numHoles; i++) holeValues[i] = 3;
+      await currentGame.courseRef.update({
+        holes: holeValues,
+      });
+    }
+    await currentGame.scoreRef.update({
+      currentHole: currentGame.numHoles,
+    });
+  };
   const handleGameEnd = async () => {
     navigation.navigate("Dashboard");
     await Promise.all(
@@ -184,6 +202,11 @@ export default function ScoreCard({ user, theme, navigation }) {
         });
       })
     );
+  };
+  const handleGameEndEarly = async () => {
+    setCurrentGame({ ...currentGame, loading: true, gameInProgress: false });
+    handleEndDialogToggle();
+    await updateDNFScores();
   };
   const handleNextPage = async () => {
     if (!currentGame.gameInProgress) {
@@ -205,6 +228,16 @@ export default function ScoreCard({ user, theme, navigation }) {
   if (currentGame.loading) return <LoadingPage theme={theme} />;
   return (
     <Page title={headerText} navigation={navigation} user={user} theme={theme}>
+      <CustomDialog
+        visible={dialogVisible}
+        setVisible={handleEndDialogToggle}
+        type="Attention"
+        prompt="You are about to end the game early."
+      >
+        <CustomButton text="Cancel" handlePress={handleEndDialogToggle} />
+        <View style={styles.buttonSpacer} />
+        <CustomButton text="Confirm" handlePress={handleGameEndEarly} />
+      </CustomDialog>
       <Fragment>
         {!currentGame.gameInProgress ? (
           <CreateGame
@@ -255,8 +288,15 @@ export default function ScoreCard({ user, theme, navigation }) {
         )}
       </Fragment>
       <View style={styles.filler} />
-      <CustomCard>
-        <CustomButton text={buttonText} handlePress={handleNextPage} />
+      <CustomCard style={styles.rowCenter} theme={theme}>
+        {page < currentGame.numHoles - 1 && (
+          <CustomButton text="End" handlePress={handleEndDialogToggle} />
+        )}
+        <CustomButton
+          style={{ flexGrow: 1, marginLeft: 10 }}
+          text={buttonText}
+          handlePress={handleNextPage}
+        />
       </CustomCard>
     </Page>
   );
@@ -285,4 +325,5 @@ const styles = StyleSheet.create({
   buttonSpacer: {
     width: 20,
   },
+  nextButton: {},
 });

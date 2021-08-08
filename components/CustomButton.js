@@ -1,14 +1,21 @@
 import * as React from "react";
 import { TouchableOpacity, StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
-export default function CustomButton({ handlePress, text, icon, disabled }) {
+export default function CustomButton({
+  handlePress,
+  text,
+  icon,
+  disabled,
+  style,
+}) {
   return (
     <Button
-      theme={{ colors: { primary: "white" } }}
+      style={style}
       icon={icon}
       mode="outlined"
       disabled={disabled}
       onPress={handlePress}
+      color="#000"
     >
       {text}
     </Button>
@@ -27,6 +34,7 @@ export const SelectionButtonDefault = ({
       mode="outlined"
       disabled={disabled}
       onPress={() => handlePress(index)}
+      color="#000"
     >
       {text}
     </Button>

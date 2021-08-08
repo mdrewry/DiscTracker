@@ -2,10 +2,10 @@ import * as React from "react";
 import { StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
 
-export default function CustomCard({ children, cardStyle }) {
+export default function CustomCard({ children, theme, style }) {
   return (
-    <Card style={{ ...styles.card, ...cardStyle }}>
-      <Card.Content>{children}</Card.Content>
+    <Card style={{ ...styles.card }}>
+      <Card.Content style={style}>{children}</Card.Content>
     </Card>
   );
 }

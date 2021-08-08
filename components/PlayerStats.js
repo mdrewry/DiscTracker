@@ -77,7 +77,7 @@ export const StandardStats = ({ stats, theme, canDivide }) => {
 export default function PlayerStats({ stats, theme }) {
   const canDivide = stats.numGames > 0;
   return (
-    <CustomCard>
+    <CustomCard theme={theme}>
       <StatHeader label="Performance" valueA="#" valueB="%" theme={theme} />
       <StandardStats canDivide={canDivide} theme={theme} stats={stats} />
     </CustomCard>
@@ -86,7 +86,7 @@ export default function PlayerStats({ stats, theme }) {
 
 export const PlayerStatsHeader = ({ stats, theme }) => {
   return (
-    <CustomCard>
+    <CustomCard theme={theme}>
       <StatHeader label="Overall" valueA="#" theme={theme} />
       <StatObj label="Games" valueA={stats.numGames} theme={theme} />
       <StatObj label="Holes" valueA={stats.numHoles} theme={theme} />
@@ -95,18 +95,21 @@ export const PlayerStatsHeader = ({ stats, theme }) => {
   );
 };
 
-export const ResultStatsHeader = ({ numHoles, numIdealPar, theme }) => {
+export const ResultStatsHeader = ({ numHoles, numIdealPar, numDNF, theme }) => {
   return (
-    <CustomCard>
+    <CustomCard theme={theme}>
       <StatHeader label="Overall" valueA="#" theme={theme} />
       <StatObj label="Holes" valueA={numHoles} theme={theme} />
       <StatObj label="Par" valueA={numIdealPar} theme={theme} />
+      {numDNF && (
+        <StatObj label="Holes Not Finished" valueA={numDNF} theme={theme} />
+      )}
     </CustomCard>
   );
 };
 export const ResultStats = ({ player, pos, theme, stats }) => {
   return (
-    <CustomCard>
+    <CustomCard theme={theme}>
       <Title>
         #{pos} {player.name ? player.name : player.phoneNumber}
       </Title>

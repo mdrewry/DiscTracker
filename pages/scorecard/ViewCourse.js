@@ -48,7 +48,7 @@ export default function ViewCourse({ route, user, navigation, theme }) {
       user={user}
       title="Viewing Course"
     >
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>{course.courseName}</Title>
         <View style={styles.rowCenter}>
           <Subheading>{course.numHoles} Holes</Subheading>
@@ -56,7 +56,7 @@ export default function ViewCourse({ route, user, navigation, theme }) {
           <Subheading>Par {course.par}</Subheading>
         </View>
       </CustomCard>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>Edit Course</Title>
         <Text style={styles.text}>Name</Text>
         <CustomField
@@ -75,7 +75,7 @@ export default function ViewCourse({ route, user, navigation, theme }) {
         />
       </CustomCard>
       <View style={styles.filler} />
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <CustomButton
           text={save ? "Save" : "Saved!"}
           handlePress={handleUpdateCourse}

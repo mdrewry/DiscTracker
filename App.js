@@ -23,15 +23,15 @@ console.warn = (message) => {
 };
 const theme = {
   ...DefaultTheme,
-  roundness: 15,
+  roundness: 5,
   colors: {
     ...DefaultTheme.colors,
-    primary: "#560bad",
+    primary: "#f1faee",
     secondary: "#3a0ca3",
-    accent: "#f72585",
+    accent: "#e63946",
     background: "white",
-    text: "#FFF",
-    surface: "#3f37c9",
+    text: "#000",
+    surface: "#a8dadc",
   },
 };
 

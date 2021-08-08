@@ -22,6 +22,7 @@ export default function ResultsPage({
       numShots: 0,
       numIdealPar: 0,
       numHoles: currentGame.numHoles,
+      numDNF: 0,
     };
     let stats = {};
     currentGame.players.forEach((p) => {
@@ -31,7 +32,8 @@ export default function ResultsPage({
       let scores = currentGame.playerScores[key];
       scores.forEach((value, index) => {
         const par = pars[index];
-        if (value === 1) stats[key].numAce++;
+        if (value === 0) stats[key].numDNF++;
+        else if (value === 1) stats[key].numAce++;
         else if (value === par - 3) stats[key].numAlbatross++;
         else if (value === par - 2) stats[key].numEagle++;
         else if (value === par - 1) stats[key].numBirdie++;
@@ -53,6 +55,7 @@ export default function ResultsPage({
       await Promise.all(
         currentGame.players.map(async (p) => {
           let userStats = p.stats;
+          userStats.numDNF += stats[p.id].numDNF;
           userStats.numAce += stats[p.id].numAce;
           userStats.numAlbatross += stats[p.id].numAlbatross;
           userStats.numEagle += stats[p.id].numEagle;
@@ -88,6 +91,7 @@ export default function ResultsPage({
             theme={theme}
             numHoles={currentGame.numHoles}
             numIdealPar={gameStats[user.id].numIdealPar}
+            numDNF={gameStats[user.id].numDNF}
           />
           {currentGame.players.sort(sortPlayerByScore).map((player, key) => (
             <ResultStats

@@ -10,7 +10,7 @@ import { Title, Appbar } from "react-native-paper";
 export default function Page({ navigation, title, children, theme, user }) {
   return (
     <Fragment>
-      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+      <Appbar.Header style={{ backgroundColor:theme.colors.background, elevation:0 }}>
         <Appbar.Content
           title={title}
           subtitle={user.name ? user.name : user.phoneNumber}
@@ -45,7 +45,7 @@ export default function Page({ navigation, title, children, theme, user }) {
           }}
         />
       </Appbar.Header>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={{...styles.container, backgroundColor:theme.colors.background}}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.main}

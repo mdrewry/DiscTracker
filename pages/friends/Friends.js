@@ -111,7 +111,7 @@ export default function Friends({ user, theme, navigation }) {
   };
   return (
     <Page navigation={navigation} title="Social" user={user} theme={theme}>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>Find Friends</Title>
         <PhoneField value={search} setValue={setSearch} />
         <View style={styles.spacer} />
@@ -132,7 +132,7 @@ export default function Friends({ user, theme, navigation }) {
           />
         )}
       </CustomCard>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>Friends</Title>
         {friendsList.map((friend, index) => (
           <FriendObjAction
@@ -144,7 +144,7 @@ export default function Friends({ user, theme, navigation }) {
           />
         ))}
       </CustomCard>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>Incoming Friend Requests</Title>
         {requests.map((friendRequest, index) => (
           <FriendRequestObj
@@ -158,7 +158,7 @@ export default function Friends({ user, theme, navigation }) {
           />
         ))}
       </CustomCard>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>Pending</Title>
         {requested.map((friendRequest, key) => (
           <FriendRequestPending

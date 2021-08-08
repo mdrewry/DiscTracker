@@ -15,14 +15,14 @@ export default function Profile({ user, theme, navigation }) {
   const [save, setSave] = useState(false);
   const [openResetForm, setOpenResetForm] = useState(false);
   const [openAdminResetForm, setOpenAdminResetForm] = useState(false);
+  const [openAdminScriptForm, setOpenAdminScriptForm] = useState(false);
   const [openSignOutForm, setOpenSignOutForm] = useState(false);
   const didMountRef = useRef(false);
   useEffect(() => {
     const getPermissions = async () => {
       if (Platform.OS !== "web") {
-        const {
-          status,
-        } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== "granted") {
           alert("Sorry, we need camera roll permissions to make this work!");
         }
@@ -52,6 +52,9 @@ export default function Profile({ user, theme, navigation }) {
   const handleToggleAdminReset = () => {
     setOpenAdminResetForm((curr) => !curr);
   };
+  const handleToggleAdminScript = () => {
+    setOpenAdminScriptForm((curr) => !curr);
+  };
   const handleToggleSignoutForm = () => {
     setOpenSignOutForm((curr) => !curr);
   };
@@ -69,6 +72,7 @@ export default function Profile({ user, theme, navigation }) {
         numDoubleBogey: 0,
         numTripleBogey: 0,
         numAce: 0,
+        numDNF: 0,
       },
     });
     handleToggleReset();
@@ -84,6 +88,7 @@ export default function Profile({ user, theme, navigation }) {
     await Promise.all(
       usersSnapshot.docs.map(async (doc) => {
         await doc.ref.update({
+          currentGame: "",
           stats: {
             numGames: 0,
             numHoles: 0,
@@ -96,11 +101,17 @@ export default function Profile({ user, theme, navigation }) {
             numDoubleBogey: 0,
             numTripleBogey: 0,
             numAce: 0,
+            numDNF: 0,
           },
         });
       })
     );
     handleToggleAdminReset();
+  };
+  const adminScript = async () => {
+    // Script goes here
+    console.log("ran script");
+    handleToggleAdminScript();
   };
   const upload = async (uri) => {
     let imageBlob = null;
@@ -133,7 +144,7 @@ export default function Profile({ user, theme, navigation }) {
   };
   return (
     <Page navigation={navigation} title="Profile" user={user} theme={theme}>
-      <CustomCard>
+      <CustomCard theme={theme}>
         <View style={styles.rowCenter}>
           <Avatar.Image
             size={90}
@@ -146,7 +157,7 @@ export default function Profile({ user, theme, navigation }) {
           </View>
         </View>
       </CustomCard>
-      <CustomCard>
+      <CustomCard theme={theme}>
         <Subheading>Edit Profile</Subheading>
         <Text style={styles.text}>Name</Text>
         <CustomField
@@ -178,7 +189,7 @@ export default function Profile({ user, theme, navigation }) {
         />
       </CustomCard>
 
-      <CustomCard>
+      <CustomCard theme={theme}>
         <Subheading>Settings</Subheading>
         <View style={styles.text} />
         <CustomButton
@@ -223,7 +234,7 @@ export default function Profile({ user, theme, navigation }) {
         </CustomDialog>
       </CustomCard>
       {user.admin && (
-        <CustomCard>
+        <CustomCard theme={theme}>
           <Subheading>Admin Settings</Subheading>
           <View style={styles.text} />
           <CustomButton
@@ -244,6 +255,26 @@ export default function Profile({ user, theme, navigation }) {
             />
             <View style={styles.buttonSpacer} />
             <CustomButton text="Confirm" handlePress={adminResetData} />
+          </CustomDialog>
+          <View style={styles.text} />
+          <CustomButton
+            text="Run Script"
+            handlePress={handleToggleAdminScript}
+            disabled={false}
+          />
+          <CustomDialog
+            visible={openAdminScriptForm}
+            setVisible={handleToggleAdminScript}
+            type="Attention"
+            prompt="You are about to run a custom script."
+          >
+            <CustomButton
+              text="Cancel"
+              handlePress={handleToggleAdminScript}
+              disabled={false}
+            />
+            <View style={styles.buttonSpacer} />
+            <CustomButton text="Confirm" handlePress={adminScript} />
           </CustomDialog>
         </CustomCard>
       )}

@@ -32,8 +32,7 @@ export default function Login({ setUser }) {
       setVerificationID(verificationID);
       if (phoneNumber.length !== 12)
         setMessage({
-          text:
-            "Error processing phone number. Make sure to include the country code (1 for US)",
+          text: "Error processing phone number. Make sure to include the country code (1 for US)",
           error: true,
         });
       setMessage({
@@ -78,6 +77,7 @@ export default function Login({ setUser }) {
               numGames: 0,
               numHoles: 0,
               numShots: 0,
+              numDNF: 0,
               numPar: 0,
               numBirdie: 0,
               numEagle: 0,
@@ -116,7 +116,7 @@ export default function Login({ setUser }) {
         firebaseConfig={firebaseConfig}
         attemptInvisibleVerification={true}
       />
-      <CustomCard>
+      <CustomCard theme={theme}>
         <PhoneField
           value={phoneNumberDisplay}
           setValue={setPhoneNumberDisplay}

@@ -54,7 +54,7 @@ export default function CreateGame({
 
   return (
     <Fragment>
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>1) Select A Course</Title>
         {courses.map((course, index) => (
           <SelectionButton
@@ -92,7 +92,7 @@ export default function CreateGame({
         />
       </CustomCard>
       {enableNewCourseForm && (
-        <CustomCard>
+        <CustomCard  theme={theme}>
           <Title>Create Course</Title>
           <Text style={styles.text}>Name</Text>
           <CustomField
@@ -120,7 +120,7 @@ export default function CreateGame({
           />
         </CustomCard>
       )}
-      <CustomCard>
+      <CustomCard  theme={theme}>
         <Title>2) Who's Playing?</Title>
         {friendsList.map((friend, index) => (
           <SelectionButton

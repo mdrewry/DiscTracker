@@ -8,10 +8,10 @@ import CustomButton, {
 
 export default function FriendObjAction({ friend, theme, handlePress, text }) {
   return (
-    <CustomCard cardStyle={{ backgroundColor: theme.colors.text }}>
+    <CustomCard theme={theme}>
       <View style={styles.rowCenter}>
         <Avatar.Image size={50} source={{ uri: friend.imageURL }} />
-        <Title style={{ ...styles.textSpacer, color: theme.colors.surface }}>
+        <Title style={{ ...styles.textSpacer }}>
           {friend.name ? friend.name : friend.phoneNumber}
         </Title>
       </View>
@@ -36,10 +36,10 @@ export const FriendRequestObj = ({
   bText,
 }) => {
   return (
-    <CustomCard cardStyle={{ backgroundColor: theme.colors.text }}>
+    <CustomCard theme={theme}>
       <View style={styles.rowCenter}>
         <Avatar.Image size={50} source={{ uri: friend.imageURL }} />
-        <Title style={{ ...styles.textSpacer, color: theme.colors.surface }}>
+        <Title style={{ ...styles.textSpacer }}>
           {friend.name ? friend.name : friend.phoneNumber}
         </Title>
       </View>
@@ -63,12 +63,10 @@ export const FriendRequestObj = ({
 };
 export const FriendRequestPending = ({ friend, theme }) => {
   return (
-    <CustomCard cardStyle={{ backgroundColor: theme.colors.text }}>
+    <CustomCard theme={theme}>
       <View style={styles.rowCenter}>
         <Avatar.Image size={50} source={{ uri: friend.imageURL }} />
-        <Title style={{ ...styles.textSpacer, color: theme.colors.surface }}>
-          {friend.name}
-        </Title>
+        <Title style={{ ...styles.textSpacer }}>{friend.name}</Title>
       </View>
       <View style={styles.spacer} />
       <View style={styles.rowCenter}>
